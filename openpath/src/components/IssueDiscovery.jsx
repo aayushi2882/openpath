@@ -62,25 +62,27 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
 
   useEffect(() => {
     let isCancelled = false;
-    setLoading(true);
-    setError(null);
 
-    searchGithubIssues({
-      q: debouncedSearch,
-      language: selectedLanguage,
-      label: selectedLabel,
-      sort: sortOrder,
-      page: currentPage,
-      per_page: 12,
-    })
-      .then((data) => {
+    async function executeSearch() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await searchGithubIssues({
+          q: debouncedSearch,
+          language: selectedLanguage,
+          label: selectedLabel,
+          sort: sortOrder,
+          page: currentPage,
+          per_page: 12,
+        });
+
         if (!isCancelled) {
           setIssues(data.items || []);
           setTotalCount(data.total_count || 0);
           setRateLimitInfo(data.rate_limit || null);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!isCancelled) {
           console.error('Issue search error:', err);
           setError({
@@ -89,12 +91,14 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
           });
           setIssues([]);
         }
-      })
-      .finally(() => {
+      } finally {
         if (!isCancelled) {
           setLoading(false);
         }
-      });
+      }
+    }
+
+    executeSearch();
 
     return () => {
       isCancelled = true;
