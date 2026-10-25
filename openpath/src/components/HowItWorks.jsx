@@ -1,27 +1,27 @@
-import { Search, Brain, Milestone, ArrowRight } from 'lucide-react';
+import { Compass, GitBranch, Brain, ArrowRight } from 'lucide-react';
 
-export default function HowItWorks() {
+export default function HowItWorks({ onStartRepository }) {
   const steps = [
     {
       num: '01',
-      title: 'Search Live GitHub Issues',
-      desc: 'Filter thousands of real open-source repositories by language (JavaScript, Python, Rust, etc.) and tags like "good first issue" or "documentation". No mock data.',
-      icon: Search,
-      tag: 'Real-time GitHub REST API',
+      title: 'Choose a program or repository',
+      desc: 'Start from a curated program directory or bring a public GitHub repository you want to understand.',
+      icon: Compass,
+      tag: 'Your starting point',
     },
     {
       num: '02',
-      title: 'Decode with AI (English / Hinglish)',
-      desc: 'Click any issue to generate a grounded explanation. Understand what problem needs solving, what the maintainer expects, and what technical jargon actually means.',
-      icon: Brain,
-      tag: 'Configurable AI Model',
+      title: 'Explore real project context',
+      desc: 'Read repository metadata, contribution guidance when available, and actual open issues from the selected project.',
+      icon: GitBranch,
+      tag: 'GitHub API data',
     },
     {
       num: '03',
-      title: 'Assess Skills & Follow the Roadmap',
-      desc: 'Enter your skills to see which match and what to learn. Then complete the interactive 8-step checklist from cloning and branching to opening your Pull Request.',
-      icon: Milestone,
-      tag: 'Interactive Roadmap',
+      title: 'Get guidance and make a plan',
+      desc: 'When local Ollama is ready, compare issues with your skills, get a grounded explanation, and follow a practical contribution checklist.',
+      icon: Brain,
+      tag: 'AI is optional',
     },
   ];
 
@@ -142,9 +142,9 @@ export default function HowItWorks() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <a href="#discover-issues" className="btn btn-dark">
-            Find issues now <ArrowRight size={16} />
-          </a>
+          <button type="button" onClick={onStartRepository} className="btn btn-dark">
+            Choose a repository <ArrowRight size={16} />
+          </button>
         </div>
       </div>
     </section>

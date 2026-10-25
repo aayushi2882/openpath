@@ -6,25 +6,25 @@ export default function FrictionPoints() {
       icon: Layers,
       title: 'Monolithic Codebases',
       quote: '“I opened the repository and saw 400 folders. I had no idea which file to touch.”',
-      solution: 'OpenPath AI predicts the 2–3 relevant directories and keywords to search with grep.',
+      solution: 'Repository context and, when configured, AI guidance can suggest where to investigate. You decide what to inspect.',
     },
     {
       icon: BookOpen,
       title: 'Cryptic Jargon',
       quote: '“The issue said ‘fix hydration mismatch and ensure idempotent cleanup’. What does that mean?”',
-      solution: 'Our Jargon Buster translates developer shorthand into plain English or casual Hinglish.',
+      solution: 'When local Ollama is ready, the explainer translates issue details into plain English or Hinglish.',
     },
     {
       icon: ShieldAlert,
       title: 'Imposter Syndrome',
       quote: '“What if I submit a PR and the maintainer thinks my question was stupid?”',
-      solution: 'Provides ready-to-use clarification questions and verified etiquette guidelines.',
+      solution: 'OpenPath surfaces repository guidance when available and helps you form clear questions to confirm with maintainers.',
     },
     {
       icon: MessageSquareDashed,
       title: 'Unclear Next Steps',
       quote: '“I think I fixed the code locally, but how do I test it and submit without breaking git?”',
-      solution: 'An interactive 8-step roadmap guides you from fork to clean pull request.',
+      solution: 'An interactive contribution roadmap gives you practical steps from setup through pull-request preparation.',
     },
   ];
 

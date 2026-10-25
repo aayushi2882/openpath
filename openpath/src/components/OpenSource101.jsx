@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { GIT_CONCEPTS, ETIQUETTE_TIPS } from '../data/openSourceGuide';
-import { BookOpen, FolderGit2, AlertCircle, ArrowRight, CheckCircle2, ChevronRight } from 'lucide-react';
+import { GIT_CONCEPTS } from '../data/openSourceGuide';
+import { FolderGit2, CheckCircle2, ChevronRight } from 'lucide-react';
 
-export default function OpenSource101() {
+export default function OpenSource101({ onExplorePrograms }) {
   const [selectedConcept, setSelectedConcept] = useState(GIT_CONCEPTS[0]);
 
   return (
@@ -39,8 +39,9 @@ export default function OpenSource101() {
           </div>
 
           <div>
-            <a
-              href="#discover-issues"
+            <button
+              type="button"
+              onClick={onExplorePrograms}
               className="btn btn-outline btn-sm"
               style={{
                 fontFamily: 'var(--font-mono)',
@@ -48,8 +49,8 @@ export default function OpenSource101() {
                 borderColor: 'var(--border-medium)',
               }}
             >
-              Skip guide ➔ Jump to issues
-            </a>
+              Explore open-source programs
+            </button>
           </div>
         </div>
 

@@ -1,20 +1,19 @@
 import express from 'express';
-import { getAiConfig, explainIssue } from '../services/aiService.js';
+import { getOllamaStatus, explainIssue, recommendIssues } from '../services/aiService.js';
 
 const router = express.Router();
 
 /**
  * GET /api/ai/status
- * Returns whether AI provider is configured and which provider/model is active
+ * Reports Ollama reachability and whether the configured model is installed
  */
-router.get('/status', (req, res) => {
-  const config = getAiConfig();
-  res.json({
-    configured: config.configured,
-    provider: config.provider || null,
-    model: config.model || null,
-    message: config.message || null,
-  });
+router.get('/status', async (req, res) => {
+  res.json(await getOllamaStatus());
+});
+
+router.get('/models', async (req, res) => {
+  const status = await getOllamaStatus();
+  res.status(status.reachable ? 200 : 503).json({ success: status.reachable, models: status.models, model: status.model, message: status.message });
 });
 
 /**
@@ -23,7 +22,7 @@ router.get('/status', (req, res) => {
  */
 router.post('/explain', async (req, res) => {
   try {
-    const { issue, repository, language = 'en', userSkills = [] } = req.body || {};
+    const { issue, repository, language = 'en', userSkills = [], experience = '' } = req.body || {};
 
     if (!issue || !issue.title) {
       return res.status(400).json({
@@ -37,6 +36,7 @@ router.post('/explain', async (req, res) => {
       repository,
       language: language === 'hinglish' ? 'hinglish' : 'en',
       userSkills: Array.isArray(userSkills) ? userSkills : [],
+      experience: typeof experience === 'string' ? experience : '',
     });
 
     if (!result.configured) {
@@ -53,10 +53,39 @@ router.post('/explain', async (req, res) => {
     });
   } catch (error) {
     console.error('[AI Explainer API Error]:', error.message);
-    res.status(500).json({
+    res.status(error.status || 502).json({
       success: false,
-      error: `AI Explanation failed: ${error.message}`,
+      error: `AI explanation failed: ${error.message}`,
     });
+  }
+});
+
+router.post('/recommend', async (req, res) => {
+  try {
+    const { repository, issues, userSkills, experience } = req.body || {};
+    if (!repository?.full_name || !Array.isArray(issues)) {
+      return res.status(400).json({ success: false, error: 'Repository details and a list of real issues are required.' });
+    }
+    if (issues.length === 0) {
+      const config = await getOllamaStatus();
+      return res.json({
+        success: true,
+        configured: config.configured,
+        recommendations: [],
+        message: config.configured ? 'Load open issues before requesting recommendations.' : config.message,
+      });
+    }
+
+    const result = await recommendIssues({
+      repository,
+      issues,
+      userSkills: Array.isArray(userSkills) ? userSkills : [],
+      experience: typeof experience === 'string' ? experience : '',
+    });
+    res.json({ success: Boolean(result.configured), ...result });
+  } catch (error) {
+    console.error('[AI Recommendations API Error]:', error.message);
+    res.status(error.status || 502).json({ success: false, error: `Issue recommendations failed: ${error.message}` });
   }
 });
 

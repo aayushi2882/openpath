@@ -101,6 +101,30 @@ body {
   padding: 0 24px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.footer-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #9CA3AF;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.footer-link:hover { color: var(--accent-lime); }
+
 /* Typography Utility */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
@@ -278,6 +302,14 @@ h1, h2, h3, h4, h5, h6 {
 .input-text:focus, .select-custom:focus {
   border-color: #1A1D20;
   box-shadow: 0 0 0 3px rgba(26, 29, 32, 0.08);
+}
+
+.spin {
+  animation: openpath-spin 0.9s linear infinite;
+}
+
+@keyframes openpath-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* GitHub Contribution Grid Graphic */

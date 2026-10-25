@@ -1,6 +1,6 @@
-import { GitBranch, Heart, ExternalLink, ArrowUp } from 'lucide-react';
+import { GitBranch, ExternalLink, ArrowUp } from 'lucide-react';
 
-export default function Footer() {
+export default function Footer({ onNavigateHome, onExplorePrograms, onStartRepository }) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -30,7 +30,7 @@ export default function Footer() {
           }}
         >
           <span className="badge badge-dark-lime badge-mono" style={{ marginBottom: '16px' }}>
-            YOUR FIRST PR AWAITS
+            YOUR OPEN-SOURCE JOURNEY
           </span>
           <h2
             style={{
@@ -51,12 +51,10 @@ export default function Footer() {
               lineHeight: '1.5',
             }}
           >
-            Pick a beginner-friendly issue, let our AI explain what needs to be changed, and follow the 8-step roadmap to your merged PR.
+            Choose a program or repository, explore real project context, and make a practical plan for contributing.
           </p>
 
-          <a href="#discover-issues" className="btn btn-primary btn-lg">
-            Start Finding Issues Now
-          </a>
+          <button type="button" onClick={onStartRepository} className="btn btn-primary btn-lg">Open a repository workspace</button>
         </div>
 
         {/* Footer Navigation Columns */}
@@ -111,24 +109,16 @@ export default function Footer() {
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li>
-                <a href="#discover-issues" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  Issue Search
-                </a>
+                <button type="button" onClick={onStartRepository} className="footer-link">Repository workspace</button>
               </li>
               <li>
-                <a href="#why-opensource" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  Open Source 101
-                </a>
+                <button type="button" onClick={onNavigateHome} className="footer-link">Open Source 101</button>
               </li>
               <li>
-                <a href="#how-it-works" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  How OpenPath Works
-                </a>
+                <button type="button" onClick={onNavigateHome} className="footer-link">How OpenPath Works</button>
               </li>
               <li>
-                <a href="#opportunities" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  Fellowships & Programs
-                </a>
+                <button type="button" onClick={onExplorePrograms} className="footer-link">Programs</button>
               </li>
             </ul>
           </div>
@@ -149,24 +139,16 @@ export default function Footer() {
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li>
-                <a href="#discover-issues" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  <code>good first issue</code>
-                </a>
+                <span><code>good first issue</code></span>
               </li>
               <li>
-                <a href="#discover-issues" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  <code>help wanted</code>
-                </a>
+                <span><code>help wanted</code></span>
               </li>
               <li>
-                <a href="#discover-issues" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  <code>documentation</code>
-                </a>
+                <span><code>documentation</code></span>
               </li>
               <li>
-                <a href="#discover-issues" style={{ color: '#9CA3AF', textDecoration: 'none' }}>
-                  <code>hacktoberfest</code>
-                </a>
+                <span><code>hacktoberfest</code></span>
               </li>
             </ul>
           </div>

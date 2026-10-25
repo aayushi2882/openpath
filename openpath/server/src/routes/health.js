@@ -1,10 +1,10 @@
 import express from 'express';
-import { getAiConfig } from '../services/aiService.js';
+import { getOllamaStatus } from '../services/aiService.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const aiConfig = getAiConfig();
+router.get('/', async (req, res) => {
+  const aiConfig = await getOllamaStatus();
   const hasGithubToken = Boolean(process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN.trim().length > 0);
 
   res.json({
@@ -16,6 +16,10 @@ router.get('/', (req, res) => {
       configured: aiConfig.configured,
       provider: aiConfig.provider || null,
       model: aiConfig.model || null,
+      reachable: aiConfig.reachable,
+      modelInstalled: aiConfig.modelInstalled,
+      models: aiConfig.models,
+      message: aiConfig.message,
     },
     github: {
       tokenConfigured: hasGithubToken,

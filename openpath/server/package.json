@@ -6,11 +6,17 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "ipaddr.js": "^2.5.0",
+    "playwright": "^1.64.1"
+  },
+  "overrides": {
+    "body-parser": "1.20.9"
   }
 }

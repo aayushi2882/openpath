@@ -1,96 +1,99 @@
-/**
- * AI Explanation Service
- * Supports multiple configurable providers: Gemini, OpenAI, Groq, and OpenAI-compatible endpoints.
- * Never invents fake AI output when unconfigured; explicitly informs the user.
- */
+const DEFAULT_OLLAMA_BASE_URL = 'http://localhost:11434';
+const DEFAULT_OLLAMA_MODEL = 'gemma4:e2b';
 
+const stringArray = { type: 'array', items: { type: 'string' } };
+const ISSUE_RECOMMENDATION_SCHEMA = {
+  type: 'object',
+  properties: {
+    recommendations: {
+      type: 'array',
+      maxItems: 3,
+      items: {
+        type: 'object',
+        properties: {
+          issueNumber: { type: 'integer' },
+          fitReason: { type: 'string' },
+          skillsMatch: stringArray,
+          missingInformation: stringArray,
+        },
+        required: ['issueNumber', 'fitReason', 'skillsMatch', 'missingInformation'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['recommendations'],
+  additionalProperties: false,
+};
+
+const ISSUE_EXPLANATION_SCHEMA = {
+  type: 'object',
+  properties: {
+    problemSummary: { type: 'string' },
+    expectedOutcome: { type: 'string' },
+    relevantSkills: stringArray,
+    technicalTerms: {
+      type: 'array',
+      items: { type: 'object', properties: { term: { type: 'string' }, definition: { type: 'string' } }, required: ['term', 'definition'], additionalProperties: false },
+    },
+    investigationSteps: stringArray,
+    clarificationQuestions: stringArray,
+    skillReadiness: {
+      type: 'object',
+      properties: {
+        matchingSkills: stringArray,
+        skillsToLearn: stringArray,
+        difficultyEstimate: { type: 'string' },
+        rationale: { type: 'string' },
+        disclaimer: { type: 'string' },
+      },
+      required: ['matchingSkills', 'skillsToLearn', 'difficultyEstimate', 'rationale', 'disclaimer'],
+      additionalProperties: false,
+    },
+    uncertaintyNotes: { type: 'string' },
+    contributionRoadmap: {
+      type: 'array',
+      minItems: 6,
+      maxItems: 6,
+      items: { type: 'object', properties: { title: { type: 'string' }, details: { type: 'string' } }, required: ['title', 'details'], additionalProperties: false },
+    },
+  },
+  required: ['problemSummary', 'expectedOutcome', 'relevantSkills', 'technicalTerms', 'investigationSteps', 'clarificationQuestions', 'skillReadiness', 'uncertaintyNotes', 'contributionRoadmap'],
+  additionalProperties: false,
+};
+
+/** Local Ollama is the only inference provider; API credentials are never read. */
 export function getAiConfig() {
-  const provider = (process.env.AI_PROVIDER || '').toLowerCase();
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
-  const groqKey = process.env.GROQ_API_KEY;
-  const genericKey = process.env.AI_API_KEY;
+  const baseUrl = (process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL).replace(/\/+$/, '');
+  return { configured: true, provider: 'ollama', baseUrl, model: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL };
+}
 
-  if (provider === 'gemini' && geminiKey) {
-    return {
-      configured: true,
-      provider: 'gemini',
-      apiKey: geminiKey,
-      model: process.env.AI_MODEL || 'gemini-2.5-flash',
-    };
+export async function getOllamaStatus() {
+  const config = getAiConfig();
+  try {
+    const response = await fetch(`${config.baseUrl}/api/tags`, { signal: AbortSignal.timeout(2500) });
+    if (!response.ok) throw new Error(`Ollama returned HTTP ${response.status}.`);
+    const payload = await response.json();
+    const models = (Array.isArray(payload.models) ? payload.models : []).map((item) => item.name).filter(Boolean);
+    const modelInstalled = models.includes(config.model);
+    return { configured: modelInstalled, reachable: true, modelInstalled, provider: 'ollama', model: config.model, models,
+      message: modelInstalled ? null : `Model ${config.model} is not installed. Run: ollama pull ${config.model}` };
+  } catch {
+    return { configured: false, reachable: false, modelInstalled: false, provider: 'ollama', model: config.model, models: [],
+      message: 'Ollama is unreachable. Start Ollama on this machine, then check the connection again.' };
   }
-  if (provider === 'openai' && openaiKey) {
-    return {
-      configured: true,
-      provider: 'openai',
-      apiKey: openaiKey,
-      model: process.env.AI_MODEL || 'gpt-4o-mini',
-    };
-  }
-  if (provider === 'groq' && groqKey) {
-    return {
-      configured: true,
-      provider: 'groq',
-      apiKey: groqKey,
-      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
-    };
-  }
-
-  // Auto-detect based on whichever key is present if AI_PROVIDER was not specified
-  if (geminiKey) {
-    return {
-      configured: true,
-      provider: 'gemini',
-      apiKey: geminiKey,
-      model: process.env.AI_MODEL || 'gemini-2.5-flash',
-    };
-  }
-  if (groqKey) {
-    return {
-      configured: true,
-      provider: 'groq',
-      apiKey: groqKey,
-      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
-    };
-  }
-  if (openaiKey) {
-    return {
-      configured: true,
-      provider: 'openai',
-      apiKey: openaiKey,
-      model: process.env.AI_MODEL || 'gpt-4o-mini',
-    };
-  }
-  if (genericKey) {
-    return {
-      configured: true,
-      provider: 'openai-compatible',
-      apiKey: genericKey,
-      model: process.env.AI_MODEL || 'default',
-      baseUrl: process.env.AI_BASE_URL || 'https://api.openai.com/v1',
-    };
-  }
-
-  return {
-    configured: false,
-    provider: null,
-    model: null,
-    message:
-      'AI Provider not configured. Set GEMINI_API_KEY, GROQ_API_KEY, or OPENAI_API_KEY in server/.env to enable live AI explanations.',
-  };
 }
 
 /**
  * Build system and user prompt for issue explanation
  */
-function buildPrompts({ issue, repository, language = 'en', userSkills = [] }) {
+function buildPrompts({ issue, repository, language = 'en', userSkills = [], experience = '' }) {
   const isHinglish = language === 'hinglish';
 
   const systemPrompt = `You are OpenPath's AI mentor for first-time open-source contributors.
 Your job is to break down real GitHub issues into actionable, beginner-friendly explanations.
 Important principles:
 1. Ground your answer ONLY in the provided issue title, description, labels, and repository metadata.
-2. Never claim you have executed or inspected unseen repository code. Make uncertainty explicit where the issue is ambiguous.
+2. Never claim you have executed or inspected unseen repository code. Do not invent repository file paths, setup commands, or technical details. Ask the contributor to search the repository and verify paths/commands.
 3. Keep technical terms accurate while explaining unfamiliar jargon clearly.
 4. Language mode: ${
     isHinglish
@@ -117,10 +120,12 @@ ISSUE LABELS: ${issueLabels || 'No labels'}
 ISSUE URL: ${issue.html_url || ''}
 
 ISSUE BODY:
-${issue.body ? issue.body.slice(0, 3500) : 'No description provided in issue body.'}
+${(issue.body || issue.body_excerpt) ? (issue.body || issue.body_excerpt).slice(0, 3500) : 'No description provided in issue body.'}
 
 CONTRIBUTOR'S STATED SKILLS:
 ${userSkillsFormatted}
+EXPERIENCE LEVEL:
+${experience || 'Not specified'}
 
 Return a valid JSON object with EXACTLY this structure:
 {
@@ -144,96 +149,54 @@ Return a valid JSON object with EXACTLY this structure:
     "rationale": "Fair rationale explaining why this issue may or may not be a reasonable starting point based on evidence.",
     "disclaimer": "This is an estimate based on the issue description. Repository architecture, build complexity, and undocumented dependencies may differ."
   },
-  "uncertaintyNotes": "Explicit statement regarding what is not known without cloning and running the repository."
+  "uncertaintyNotes": "Explicit statement regarding what is not known without cloning and running the repository.",
+  "contributionRoadmap": [
+    { "title": "Understand the problem", "details": "..." },
+    { "title": "Inspect relevant files", "details": "Search by terms from the issue; do not guess paths." },
+    { "title": "Prepare the development environment", "details": "Follow verified repository setup instructions." },
+    { "title": "Implement a focused fix", "details": "..." },
+    { "title": "Run appropriate tests", "details": "Use tests or checks documented by the repository." },
+    { "title": "Prepare the pull request", "details": "..." }
+  ]
 }`;
 
   return { systemPrompt, userPrompt };
 }
 
 /**
- * Call Gemini API using native fetch
+ * Call the configured local Ollama model and request JSON output.
  */
-async function callGemini(config, systemPrompt, userPrompt) {
-  // Support Gemini v1beta endpoint
-  const model = config.model || 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.apiKey}`;
-
-  const payload = {
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          {
-            text: `${systemPrompt}\n\n${userPrompt}`,
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.3,
-      responseMimeType: 'application/json',
-    },
-  };
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+async function callOllama(config, systemPrompt, userPrompt, responseJsonSchema) {
+  let payload;
+  try {
+    const response = await fetch(`${config.baseUrl}/api/chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(300_000),
+      body: JSON.stringify({
+        model: config.model, stream: false, think: false, format: responseJsonSchema || 'json',
+        options: { temperature: 0.3, num_predict: 2200 },
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+      }),
+    });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      const error = new Error(response.status === 404 ? `Ollama model ${config.model} is unavailable. Run: ollama pull ${config.model}` : `Ollama request failed (${response.status})${detail ? `: ${detail.slice(0, 200)}` : '.'}`);
+      error.status = response.status === 404 ? 503 : 502;
+      throw error;
+    }
+    payload = await response.json();
+  } catch (cause) {
+    if (cause.status) throw cause;
+    const timedOut = cause.name === 'TimeoutError' || cause.name === 'AbortError';
+    const error = new Error(timedOut ? 'Local Ollama inference timed out. Try again or use a smaller model.' : 'Could not connect to local Ollama. Start Ollama and verify OLLAMA_BASE_URL.');
+    error.status = timedOut ? 504 : 503;
+    throw error;
   }
 
-  const data = await response.json();
-  const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  const rawText = payload?.message?.content;
   if (!rawText) {
-    throw new Error('Gemini API returned an empty response candidate');
+    const error = new Error('Ollama returned an empty response. Please retry with shorter issue details.');
+    error.status = 502; throw error;
   }
-
-  return cleanAndParseJson(rawText);
-}
-
-/**
- * Call OpenAI or OpenAI-compatible endpoint (including Groq)
- */
-async function callOpenAiCompatible(config, systemPrompt, userPrompt) {
-  const baseUrl =
-    config.provider === 'groq'
-      ? 'https://api.groq.com/openai/v1'
-      : config.baseUrl || 'https://api.openai.com/v1';
-
-  const url = `${baseUrl}/chat/completions`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: config.model,
-      temperature: 0.3,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`${config.provider.toUpperCase()} API error (${response.status}): ${errText}`);
-  }
-
-  const data = await response.json();
-  const rawText = data?.choices?.[0]?.message?.content;
-  if (!rawText) {
-    throw new Error('AI provider returned an empty completion content');
-  }
-
   return cleanAndParseJson(rawText);
 }
 
@@ -262,14 +225,14 @@ function cleanAndParseJson(raw) {
       const extracted = cleaned.substring(firstBrace, lastBrace + 1);
       return JSON.parse(extracted);
     }
-    throw new Error(`Failed to parse AI output into JSON: ${err.message}`);
+    throw new Error(`Failed to parse AI output into JSON: ${err.message}`, { cause: err });
   }
 }
 
 /**
  * Main export: explain issue
  */
-export async function explainIssue({ issue, repository, language = 'en', userSkills = [] }) {
+export async function explainIssue({ issue, repository, language = 'en', userSkills = [], experience = '' }) {
   const config = getAiConfig();
 
   if (!config.configured) {
@@ -285,20 +248,113 @@ export async function explainIssue({ issue, repository, language = 'en', userSki
     repository,
     language,
     userSkills,
+    experience,
   });
 
   let explanation;
-  if (config.provider === 'gemini') {
-    explanation = await callGemini(config, systemPrompt, userPrompt);
-  } else {
-    explanation = await callOpenAiCompatible(config, systemPrompt, userPrompt);
-  }
+  explanation = await callOllama(config, systemPrompt, userPrompt, ISSUE_EXPLANATION_SCHEMA);
 
   return {
     configured: true,
     provider: config.provider,
     model: config.model,
     language,
-    explanation,
+    explanation: validateExplanation(explanation),
   };
+}
+
+function textOr(value, fallback = '') {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function stringList(value) {
+  return Array.isArray(value) ? value.filter((item) => typeof item === 'string' && item.trim()).map((item) => item.trim()).slice(0, 12) : [];
+}
+
+function validateExplanation(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('AI returned an invalid explanation. Please try again.');
+  }
+  const readiness = value.skillReadiness && typeof value.skillReadiness === 'object' ? value.skillReadiness : {};
+  const technicalTerms = Array.isArray(value.technicalTerms) ? value.technicalTerms
+    .filter((item) => item && typeof item.term === 'string' && typeof item.definition === 'string')
+    .slice(0, 12).map(({ term, definition }) => ({ term: term.trim(), definition: definition.trim() })) : [];
+  const roadmapTitles = [
+    'Understand the problem',
+    'Inspect relevant files',
+    'Prepare the development environment',
+    'Implement a focused fix',
+    'Run appropriate tests',
+    'Prepare the pull request',
+  ];
+  const contributionRoadmap = Array.isArray(value.contributionRoadmap) && value.contributionRoadmap.length >= roadmapTitles.length
+    ? roadmapTitles.map((title, index) => ({ title, details: typeof value.contributionRoadmap[index]?.details === 'string' ? value.contributionRoadmap[index].details.trim() : '' }))
+    : [];
+  const result = {
+    problemSummary: textOr(value.problemSummary),
+    expectedOutcome: textOr(value.expectedOutcome),
+    relevantSkills: stringList(value.relevantSkills),
+    technicalTerms,
+    investigationSteps: stringList(value.investigationSteps),
+    clarificationQuestions: stringList(value.clarificationQuestions),
+    skillReadiness: {
+      matchingSkills: stringList(readiness.matchingSkills),
+      skillsToLearn: stringList(readiness.skillsToLearn),
+      difficultyEstimate: textOr(readiness.difficultyEstimate, 'Difficulty could not be estimated from the supplied issue details.'),
+      rationale: textOr(readiness.rationale),
+      disclaimer: textOr(readiness.disclaimer, 'This is an estimate based only on the supplied issue and repository information.'),
+    },
+    uncertaintyNotes: textOr(value.uncertaintyNotes, 'Repository files and setup were not inspected. Verify paths and commands in the repository before contributing.'),
+    contributionRoadmap,
+  };
+  if (!result.problemSummary || !result.expectedOutcome || result.contributionRoadmap.length !== roadmapTitles.length || result.contributionRoadmap.some((step) => !step.details)) {
+    throw new Error('AI returned an incomplete explanation or contribution roadmap. Please try again.');
+  }
+  return result;
+}
+
+/** Rank only the real issues supplied by the repository search. */
+export async function recommendIssues({ repository, issues, userSkills = [], experience = '' }) {
+  const config = getAiConfig();
+  if (!config.configured) {
+    return { configured: false, message: getAiConfig().message, recommendations: [] };
+  }
+
+  const issueEvidence = issues.slice(0, 20).map((issue) => ({
+    number: issue.number,
+    title: issue.title,
+    labels: (issue.labels || []).map((label) => label.name),
+    description: (issue.body || issue.body_excerpt || '').slice(0, 1000),
+    url: issue.html_url,
+  }));
+  const systemPrompt = 'You help beginners evaluate real open-source issues. Use only the supplied repository and issue evidence. Never infer unseen codebase details or guarantee suitability. Return only valid JSON.';
+  const userPrompt = `Review these actual open issues from ${repository.full_name} for a contributor. Rank by evidence in the description and fit to stated skills and experience; labels are only signals.
+Repository language: ${repository.language || 'not provided'}
+Repository description: ${repository.description || 'not provided'}
+Repository topics: ${(repository.topics || []).join(', ') || 'not provided'}
+Contributor skills: ${userSkills.join(', ') || 'not provided'}
+Experience: ${experience || 'not provided'}
+Issues: ${JSON.stringify(issueEvidence)}
+
+Return JSON with a "recommendations" array containing at most 3 entries. Each entry must use an exact issue number from the supplied data and include "issueNumber", "fitReason" grounded in the title/body/labels (at most two concise sentences), "skillsMatch" (array containing only stated contributor skills), and "missingInformation" (at most two concise items describing what cannot be determined from this data). Prefer issues where evidence aligns with stated skills and experience; do not treat labels as proof of beginner suitability. Do not create issue numbers, repository paths, or technical claims not present in the input. Keep the entire response concise.`;
+
+  const rawRecommendations = await callOllama(config, systemPrompt, userPrompt, ISSUE_RECOMMENDATION_SCHEMA);
+  if (!rawRecommendations || !Array.isArray(rawRecommendations.recommendations)) {
+    throw new Error('AI returned an invalid recommendation response. Please try again.');
+  }
+  const issuesByNumber = new Map(issues.map((issue) => [Number(issue.number), issue]));
+  const recommendations = rawRecommendations.recommendations
+    .filter((item) => issuesByNumber.has(Number(item.issueNumber)) && typeof item.fitReason === 'string' && item.fitReason.trim())
+    .slice(0, 3)
+    .map((item) => ({
+      issueNumber: Number(item.issueNumber),
+      fitReason: item.fitReason,
+      skillsMatch: Array.isArray(item.skillsMatch) ? item.skillsMatch
+        .filter((skill) => typeof skill === 'string' && userSkills.some((userSkill) => userSkill.toLowerCase() === skill.toLowerCase())) : [],
+      missingInformation: Array.isArray(item.missingInformation)
+        ? item.missingInformation.filter((detail) => typeof detail === 'string')
+        : [],
+    }));
+
+  return { configured: true, provider: config.provider, model: config.model, recommendations };
 }

@@ -3,7 +3,7 @@ import { X, Sparkles, Key, CheckCircle2, AlertCircle, Copy, Check, ExternalLink,
 import { getSystemHealth } from '../services/api';
 
 export default function SetupModal({ isOpen, onClose }) {
-  const [health, setHealth] = useState(null);
+  const [health, setHealth] = useState({ status: 'checking', ai: { configured: false } });
   const [loading, setLoading] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
 
@@ -15,25 +15,29 @@ export default function SetupModal({ isOpen, onClose }) {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      checkStatus();
-    }
+    if (!isOpen) return undefined;
+
+    let isActive = true;
+    getSystemHealth().then((data) => {
+      if (isActive) setHealth(data);
+    });
+
+    return () => {
+      isActive = false;
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const sampleEnvText = `# OpenPath Configuration (place in server/.env)
-PORT=5000
+PORT=5501
 
 # Recommended: Add GitHub Token to get 5,000 requests/hr (instead of 10/min)
 GITHUB_TOKEN=
 
-# Choose an AI provider: 'gemini', 'openai', or 'groq'
-AI_PROVIDER=gemini
-AI_MODEL=gemini-2.5-flash
-
-# Provide API Key (Google AI Studio has free tier):
-GEMINI_API_KEY=your_gemini_api_key_here
+# Local Ollama model:
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=gemma4:e2b
 `;
 
   const copyToClipboard = () => {
@@ -93,7 +97,9 @@ GEMINI_API_KEY=your_gemini_api_key_here
                 <span style={{ fontSize: '13px', fontWeight: 600 }}>Express Backend</span>
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                {health?.status === 'ok'
+                {health?.status === 'checking'
+                  ? 'Checking backend…'
+                  : health?.status === 'ok'
                   ? `Online (Uptime: ${health.uptime}s)`
                   : 'Offline / unreachable'}
               </div>
@@ -117,18 +123,26 @@ GEMINI_API_KEY=your_gemini_api_key_here
                 <span style={{ fontSize: '13px', fontWeight: 600 }}>AI Explainer</span>
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                {health?.ai?.configured
-                  ? `Configured (${health.ai.provider})`
-                  : 'No key set (Setup below)'}
+                {health?.status === 'checking'
+                  ? 'Checking AI configuration…'
+                  : health?.ai?.configured
+                  ? `Ready (${health.ai.provider}: ${health.ai.model})`
+                  : health?.ai?.message || 'Checking local Ollama…'}
               </div>
             </div>
           </div>
+
+          {health?.ai?.reachable && health.ai.models?.length > 0 && (
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '-12px', marginBottom: '20px' }}>
+              Installed Ollama models: {health.ai.models.join(', ')}. Set <code>OLLAMA_MODEL</code> in <code>server/.env</code> to choose the model OpenPath uses.
+            </p>
+          )}
 
           <h4 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '8px' }}>
             How to configure your environment:
           </h4>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-            OpenPath is designed to work immediately with public GitHub data without any setup. To enable live AI issue explanations, create a <code style={{ fontFamily: 'var(--font-mono)' }}>server/.env</code> file:
+            OpenPath uses local Ollama for AI. Start Ollama, then configure <code style={{ fontFamily: 'var(--font-mono)' }}>server/.env</code>:
           </p>
 
           <div
@@ -168,15 +182,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="badge badge-subtle badge-mono">1</span>
               <span>
-                Get a free Gemini API key from{' '}
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--text-primary)', fontWeight: 600 }}
-                >
-                  Google AI Studio <ExternalLink size={12} style={{ display: 'inline' }} />
-                </a>
+                Start Ollama locally, then run <code>ollama pull gemma4:e2b</code> if needed.
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

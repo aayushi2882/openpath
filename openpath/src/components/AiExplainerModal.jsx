@@ -21,10 +21,12 @@ import ContributionRoadmap from './ContributionRoadmap';
 
 export default function AiExplainerModal({
   issue,
+  repository: selectedRepository,
   onClose,
   userSkills,
   onUpdateUserSkills,
   onOpenSetupModal,
+  experience = 'New to open source',
 }) {
   const [activeTab, setActiveTab] = useState('explainer'); // 'explainer', 'readiness', 'roadmap'
   const [language, setLanguage] = useState('en'); // 'en' | 'hinglish'
@@ -47,7 +49,7 @@ export default function AiExplainerModal({
 
       try {
         // Fetch detailed repo data if available
-        let repoData = null;
+        let repoData = selectedRepository || null;
         if (issue.repo_owner && issue.repo_short_name) {
           try {
             const details = await getIssueDetails(
@@ -59,8 +61,9 @@ export default function AiExplainerModal({
               repoData = details.repository;
               setDetailedRepo(repoData);
             }
-          } catch {
-            // Non-fatal if details endpoint fails; issue object already contains primary fields
+          } catch (detailsError) {
+            // Non-fatal: the issue object already contains the primary fields.
+            console.warn('Could not load additional issue details; continuing with search data.', detailsError);
           }
         }
 
@@ -70,6 +73,7 @@ export default function AiExplainerModal({
           repository: repoData,
           language,
           userSkills,
+          experience,
         });
 
         if (!isCancelled) {
@@ -91,7 +95,7 @@ export default function AiExplainerModal({
     return () => {
       isCancelled = true;
     };
-  }, [issue, language, userSkills]);
+  }, [issue, language, userSkills, selectedRepository, experience]);
 
   // Handle escape key to close modal
   useEffect(() => {
@@ -107,7 +111,7 @@ export default function AiExplainerModal({
   const explanation = aiResult?.explanation;
 
   const copyEnvSnippet = () => {
-    navigator.clipboard.writeText(`GEMINI_API_KEY=your_key_here\n# or\nOPENAI_API_KEY=your_key_here`);
+    navigator.clipboard.writeText('OLLAMA_BASE_URL=http://localhost:11434\nOLLAMA_MODEL=gemma4:e2b');
     setCopiedEnv(true);
     setTimeout(() => setCopiedEnv(false), 2000);
   };
@@ -371,9 +375,8 @@ export default function AiExplainerModal({
                       marginBottom: '18px',
                     }}
                   >
-                    To generate live issue breakdowns in simple English and Hinglish, add an API key in{' '}
+                    To generate live issue breakdowns in simple English and Hinglish, start Ollama and configure it in{' '}
                     <code style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>server/.env</code>.
-                    You can use Google Gemini (free API key available on Google AI Studio), Groq, or OpenAI.
                   </p>
 
                   <div
@@ -389,10 +392,8 @@ export default function AiExplainerModal({
                     }}
                   >
                     <div style={{ color: '#9CA3AF', marginBottom: '6px' }}># In server/.env:</div>
-                    <div style={{ color: 'var(--accent-lime)' }}>AI_PROVIDER=gemini</div>
-                    <div>GEMINI_API_KEY=your_gemini_key_from_aistudio</div>
-                    <div style={{ color: '#6B7280', marginTop: '6px' }}># OR for OpenAI:</div>
-                    <div>OPENAI_API_KEY=your_openai_key</div>
+                    <div style={{ color: 'var(--accent-lime)' }}>OLLAMA_BASE_URL=http://localhost:11434</div>
+                    <div>OLLAMA_MODEL=gemma4:e2b</div>
 
                     <button
                       type="button"
@@ -430,14 +431,6 @@ export default function AiExplainerModal({
                         Open Setup Guide
                       </button>
                     )}
-                    <a
-                      href="https://aistudio.google.com/app/apikey"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline btn-sm"
-                    >
-                      Get Free Gemini Key <ExternalLink size={13} />
-                    </a>
                   </div>
                 </div>
               )}
@@ -475,7 +468,7 @@ export default function AiExplainerModal({
                     }}
                   >
                     <span>
-                      Grounded explanation powered by <strong>{aiResult.provider}</strong> ({aiResult.model})
+                    Grounded explanation powered by <strong>{aiResult.model?.toLowerCase().startsWith('gemma') ? 'Gemma via Ollama' : aiResult.provider}</strong> ({aiResult.model})
                     </span>
                     <span className="badge badge-lime badge-mono" style={{ fontSize: '11px' }}>
                       {language === 'hinglish' ? 'Hinglish Mode' : 'Simple English Mode'}
@@ -742,7 +735,7 @@ export default function AiExplainerModal({
           )}
 
           {/* TAB 3: CONTRIBUTION ROADMAP */}
-          {activeTab === 'roadmap' && <ContributionRoadmap issue={issue} />}
+          {activeTab === 'roadmap' && <ContributionRoadmap issue={issue} aiRoadmap={explanation?.contributionRoadmap || []} />}
         </div>
 
         {/* Modal Footer */}

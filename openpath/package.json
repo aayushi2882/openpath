@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "concurrently --kill-others -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite",
     "dev:server": "npm --prefix server run dev",
     "build": "vite build",

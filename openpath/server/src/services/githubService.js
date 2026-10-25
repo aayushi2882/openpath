@@ -6,6 +6,115 @@
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
+async function fetchGithubJson(url) {
+  const response = await fetch(url, { headers: getHeaders() });
+  if (!response.ok) {
+    let message = `GitHub API error: ${response.status} ${response.statusText}`;
+    try {
+      const body = await response.json();
+      if (body.message) message = `GitHub: ${body.message}`;
+    } catch (error) {
+      console.warn('Could not parse GitHub error response.', error);
+    }
+    const requestError = new Error(message);
+    requestError.status = response.status;
+    throw requestError;
+  }
+  return response.json();
+}
+
+function decodeGitHubFile(file) {
+  if (!file?.content || file.encoding !== 'base64') return '';
+  return Buffer.from(file.content, 'base64').toString('utf8');
+}
+
+/** Fetch public repository metadata and the available onboarding documents. */
+export async function getRepositoryWorkspace(owner, repo) {
+  const repoData = await fetchGithubJson(`${GITHUB_API_BASE}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
+  const repository = {
+    full_name: repoData.full_name,
+    name: repoData.name,
+    owner: repoData.owner?.login || owner,
+    description: repoData.description,
+    html_url: repoData.html_url,
+    language: repoData.language,
+    topics: repoData.topics || [],
+    stars: repoData.stargazers_count,
+    forks: repoData.forks_count,
+    open_issues: repoData.open_issues_count,
+    default_branch: repoData.default_branch,
+    license: repoData.license?.spdx_id || null,
+    updated_at: repoData.updated_at,
+  };
+
+  const readDocument = async (paths) => {
+    for (const documentPath of paths) {
+      try {
+        const file = await fetchGithubJson(`${GITHUB_API_BASE}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${documentPath}`);
+        if (file.type === 'file') {
+          return {
+            path: file.path,
+            url: file.html_url,
+            content: decodeGitHubFile(file).slice(0, 16000),
+          };
+        }
+      } catch (error) {
+        if (error.status !== 404) throw error;
+      }
+    }
+    return null;
+  };
+
+  const [readme, contributingGuide] = await Promise.all([
+    readDocument(['README.md', 'README.rst', 'README']),
+    readDocument(['CONTRIBUTING.md', '.github/CONTRIBUTING.md', 'docs/CONTRIBUTING.md']),
+  ]);
+
+  return { repository, readme, contributingGuide };
+}
+
+/** Search real public GitHub repositories for the repository picker. */
+export async function searchRepositories({ query, page = 1, perPage = 8 }) {
+  const searchQuery = query.trim();
+  if (!searchQuery) throw new Error('Enter a topic, language, or project name to search repositories.');
+
+  const url = new URL(`${GITHUB_API_BASE}/search/repositories`);
+  url.searchParams.set('q', `${searchQuery} is:public`);
+  url.searchParams.set('sort', 'stars');
+  url.searchParams.set('order', 'desc');
+  url.searchParams.set('page', String(Math.max(1, parseInt(page, 10) || 1)));
+  url.searchParams.set('per_page', String(Math.min(20, Math.max(1, parseInt(perPage, 10) || 8))));
+
+  const data = await fetchGithubJson(url.toString());
+  return {
+    total_count: data.total_count || 0,
+    items: (data.items || []).map((item) => ({
+      id: item.id,
+      full_name: item.full_name,
+      name: item.name,
+      owner: item.owner?.login,
+      description: item.description,
+      html_url: item.html_url,
+      language: item.language,
+      topics: item.topics || [],
+      stars: item.stargazers_count,
+      open_issues: item.open_issues_count,
+    })),
+  };
+}
+
+/** Search issues using GitHub's repository qualifier and enforce the repository boundary. */
+export async function searchRepositoryIssues(owner, repo, options = {}) {
+  const fullName = `${owner}/${repo}`;
+  const qualifiers = [`repo:${fullName}`, 'is:issue', 'is:open'];
+  if (options.language && options.language !== 'all') qualifiers.push(`language:${options.language}`);
+  if (options.label && options.label !== 'all') qualifiers.push(`label:"${options.label.replaceAll('"', '')}"`);
+  if (options.q?.trim()) qualifiers.push(options.q.trim());
+  const results = await searchIssues({ ...options, q: qualifiers.join(' '), language: '', label: '' });
+  const items = results.items.filter((issue) => issue.repo_name?.toLowerCase() === fullName.toLowerCase());
+  return { ...results, items };
+}
+
 /**
  * Returns common request headers including User-Agent and optional authorization
  */
@@ -73,7 +182,7 @@ export async function searchIssues({
   const queryParts = ['is:issue', 'is:open'];
 
   // Handle label filter
-  if (label && label.trim().length > 0) {
+  if (label && label.trim().length > 0 && label.toLowerCase() !== 'all') {
     // If user provided a specific label, wrap in quotes
     queryParts.push(`label:"${label.trim()}"`);
   } else if (!q && !language) {
@@ -157,6 +266,7 @@ export async function searchIssues({
       updated_at: item.updated_at,
       body: item.body || '',
       body_excerpt: createExcerpt(item.body),
+      is_pull_request: Boolean(item.pull_request),
     };
   });
 
@@ -165,7 +275,7 @@ export async function searchIssues({
     incomplete_results: data.incomplete_results || false,
     page: parseInt(page, 10) || 1,
     per_page: parseInt(per_page, 10) || 15,
-    items,
+    items: items.filter((item) => !item.is_pull_request),
     rate_limit: {
       limit: rateLimitLimit ? parseInt(rateLimitLimit, 10) : null,
       remaining: rateLimitRemaining ? parseInt(rateLimitRemaining, 10) : null,

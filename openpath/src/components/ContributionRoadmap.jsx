@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckSquare, Square, RotateCcw, ExternalLink, Lightbulb, Sparkles } from 'lucide-react';
+import { CheckSquare, Square, RotateCcw, Lightbulb } from 'lucide-react';
 
 const ROADMAP_STEPS = [
   {
@@ -60,7 +60,7 @@ const ROADMAP_STEPS = [
   },
 ];
 
-export default function ContributionRoadmap({ issue }) {
+export default function ContributionRoadmap({ issue, aiRoadmap = [] }) {
   const storageKey = `openpath_roadmap_${issue?.id || 'default'}`;
 
   const [completedSteps, setCompletedSteps] = useState(() => {
@@ -168,6 +168,22 @@ export default function ContributionRoadmap({ issue }) {
           />
         </div>
       </div>
+
+      {/* 8-Step Checklist List */}
+      {aiRoadmap.length > 0 && (
+        <section aria-label="AI suggested roadmap for this issue" style={{ marginBottom: '22px', padding: '16px', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--bg-canvas)' }}>
+          <h4 style={{ fontSize: '15px', marginBottom: '6px' }}>Suggested steps for this issue</h4>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>Generated from the issue description and repository metadata. Verify file paths, setup commands, and tests against the repository before following them.</p>
+          <ol style={{ paddingLeft: '20px', display: 'grid', gap: '10px' }}>
+            {aiRoadmap.map((step, index) => (
+              <li key={`${index}-${step.title}`}>
+                <strong style={{ fontSize: '13px' }}>{step.title}</strong>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '3px' }}>{step.details}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       {/* 8-Step Checklist List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, RefreshCw, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { searchGithubIssues } from '../services/api';
+import { searchGithubIssues, searchRepositoryIssues } from '../services/api';
 import IssueCard from './IssueCard';
 
 const LANGUAGES = [
@@ -31,11 +31,13 @@ const QUICK_PICKS = [
   { name: '🦀 Rust Helpers', label: 'good first issue', lang: 'rust', q: '' },
 ];
 
-export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
+export default function IssueDiscovery({ onSelectIssue, selectedIssueId, repository, onIssuesLoaded }) {
+  const repositoryOwner = repository?.owner;
+  const repositoryName = repository?.name;
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('all');
-  const [selectedLabel, setSelectedLabel] = useState('good first issue');
+  const [selectedLabel, setSelectedLabel] = useState(repository ? 'all' : 'good first issue');
   const [sortOrder, setSortOrder] = useState('updated');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -68,17 +70,21 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
       setError(null);
 
       try {
-        const data = await searchGithubIssues({
+        const searchOptions = {
           q: debouncedSearch,
           language: selectedLanguage,
           label: selectedLabel,
           sort: sortOrder,
           page: currentPage,
           per_page: 12,
-        });
+        };
+        const data = repositoryOwner && repositoryName
+          ? await searchRepositoryIssues(repositoryOwner, repositoryName, searchOptions)
+          : await searchGithubIssues(searchOptions);
 
         if (!isCancelled) {
           setIssues(data.items || []);
+          onIssuesLoaded?.(data.items || []);
           setTotalCount(data.total_count || 0);
           setRateLimitInfo(data.rate_limit || null);
         }
@@ -90,6 +96,7 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
             isRateLimit: Boolean(err.isRateLimit),
           });
           setIssues([]);
+          onIssuesLoaded?.([]);
         }
       } finally {
         if (!isCancelled) {
@@ -103,7 +110,7 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedSearch, selectedLanguage, selectedLabel, sortOrder, currentPage, refreshCount]);
+  }, [debouncedSearch, selectedLanguage, selectedLabel, sortOrder, currentPage, refreshCount, repositoryOwner, repositoryName, onIssuesLoaded]);
 
   const handleQuickPick = (pick) => {
     setSelectedLabel(pick.label);
@@ -115,7 +122,7 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
   const handleResetFilters = () => {
     setSearchTerm('');
     setSelectedLanguage('all');
-    setSelectedLabel('good first issue');
+    setSelectedLabel(repository ? 'all' : 'good first issue');
     setSortOrder('updated');
     setCurrentPage(1);
   };
@@ -134,9 +141,9 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
         <div style={{ maxWidth: '720px', marginBottom: '36px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span className="badge badge-dark-lime badge-mono" style={{ backgroundColor: '#181A1F' }}>
-              LIVE GITHUB REPOSITORIES
+              {repository ? `OPEN ISSUES · ${repository.full_name}` : 'LIVE GITHUB ISSUES'}
             </span>
-            {rateLimitInfo?.remaining !== null && (
+            {rateLimitInfo?.remaining != null && (
               <span
                 style={{
                   fontFamily: 'var(--font-mono)',
@@ -149,10 +156,10 @@ export default function IssueDiscovery({ onSelectIssue, selectedIssueId }) {
             )}
           </div>
           <h2 style={{ fontSize: '32px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
-            Find your next open-source contribution
+            {repository ? `Explore issues in ${repository.full_name}` : 'Find your next open-source contribution'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
-            Real public GitHub issues with beginner-friendly labels. Select any issue to translate technical jargon into understandable steps.
+            {repository ? 'Open issues fetched from this repository only. Labels come from maintainers and are useful context, but do not guarantee an issue is beginner-friendly.' : 'Real open issues from across GitHub. Labels come from maintainers and are useful context, but do not guarantee an issue is beginner-friendly.'}
           </p>
         </div>
 
