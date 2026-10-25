@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="OpenPath">
+<defs><clipPath id="r"><rect width="1200" height="300" rx="16"/></clipPath></defs>
+<g clip-path="url(#r)">
+<rect width="1200" height="300" fill="#0E0F12"/>
+<rect x="0.5" y="0.5" width="1199" height="299" rx="16" fill="none" stroke="#FFFFFF" stroke-opacity="0.10"/>
+<g transform="translate(80,62)" fill="none" stroke="#D2F824" stroke-width="4" stroke-linecap="round">
+  <path d="M10 6 V44 M10 24 C10 36 40 30 40 44"/>
+  <circle cx="10" cy="6" r="6" fill="#0E0F12"/><circle cx="10" cy="44" r="6" fill="#0E0F12"/><circle cx="40" cy="44" r="6" fill="#D2F824"/>
+</g>
+<text x="146" y="106" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="56" font-weight="700" letter-spacing="-1.5" fill="#F4F5F7">OpenPath</text>
+<text x="82" y="156" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="20" fill="#9AA1AE">From curious beginner to confident contributor.</text>
+<line x1="180" y1="232" x2="1020" y2="232" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2"/>
+<circle cx="180" cy="232" r="6" fill="#0E0F12" stroke="#D2F824" stroke-width="2"/>
+<circle cx="180" cy="232" r="6" fill="none" stroke="#D2F824" stroke-width="1.5"><animate attributeName="r" values="6;6;18;18" keyTimes="0;0.090;0.160;1" dur="7.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;0.7;0" keyTimes="0;0.090;0.160;1" dur="7.0s" repeatCount="indefinite"/></circle>
+<text x="180" y="266" text-anchor="middle" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" fill="#C5CAD3">Skills</text>
+<circle cx="460" cy="232" r="6" fill="#0E0F12" stroke="#D2F824" stroke-width="2"/>
+<circle cx="460" cy="232" r="6" fill="none" stroke="#D2F824" stroke-width="1.5"><animate attributeName="r" values="6;6;18;18" keyTimes="0;0.357;0.427;1" dur="7.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;0.7;0" keyTimes="0;0.357;0.427;1" dur="7.0s" repeatCount="indefinite"/></circle>
+<text x="460" y="266" text-anchor="middle" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" fill="#C5CAD3">GitHub issue</text>
+<circle cx="740" cy="232" r="6" fill="#0E0F12" stroke="#D2F824" stroke-width="2"/>
+<circle cx="740" cy="232" r="6" fill="none" stroke="#D2F824" stroke-width="1.5"><animate attributeName="r" values="6;6;18;18" keyTimes="0;0.623;0.693;1" dur="7.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;0.7;0" keyTimes="0;0.623;0.693;1" dur="7.0s" repeatCount="indefinite"/></circle>
+<text x="740" y="266" text-anchor="middle" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" fill="#C5CAD3">AI explanation</text>
+<circle cx="1020" cy="232" r="6" fill="#0E0F12" stroke="#D2F824" stroke-width="2"/>
+<circle cx="1020" cy="232" r="6" fill="none" stroke="#D2F824" stroke-width="1.5"><animate attributeName="r" values="6;6;18;18" keyTimes="0;0.890;0.960;1" dur="7.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;0.7;0" keyTimes="0;0.890;0.960;1" dur="7.0s" repeatCount="indefinite"/></circle>
+<text x="1020" y="266" text-anchor="middle" font-family="'Segoe UI', Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" fill="#C5CAD3">Pull request</text>
+<circle r="4" fill="#D2F824"><animateMotion dur="7.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.100;0.900;1" path="M180,232 L1020,232"/></circle>
+</g></svg>
