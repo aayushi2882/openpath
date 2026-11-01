@@ -22,7 +22,7 @@ The governing plan is the OpenPath Master Implementation Plan (Phases 0–10). T
 - [x] Current branch/status/worktrees and existing branches inspected before setup.
 - [x] Build, lint, backend tests, app startup, health, AI status, and live public GitHub metadata/issues path checked.
 - [x] Current-state, architecture, feature and technical-debt notes prepared in repository documentation.
-- [x] `develop`, both feature branches, separate worktrees, independent dependency installs, and setup docs verified.
+- [x] `main` confirmed as the integration branch; both feature branches, separate worktrees, independent dependency installs, and setup docs verified.
 - [x] Frontend build/lint, backend tests, separate-worktree startup, health/AI status, and live GitHub metadata/issues checks recorded.
 - [ ] Both developers approve the baseline and confirm both environments are usable.
 

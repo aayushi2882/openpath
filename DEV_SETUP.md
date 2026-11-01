@@ -4,12 +4,12 @@
 
 - Canonical repo: `https://github.com/aayushi2882/openpath.git`
 - Default/release branch: `main` (`origin/HEAD -> origin/main`).
-- Integration base: local `develop`, created from `origin/main` at `e22ba5d`; shared Phase 0 docs are committed at `96597ed`.
-- Developer branches: `feature/ai-backend` and `feature/frontend`, both currently at the same `develop` commit `96597ed`.
+- Integration branch: `main`, verified as the repository default (`origin/HEAD -> origin/main`).
+- Developer branches: `feature/ai-backend` and `feature/frontend`, both based on the same Phase 0 documentation history.
 - Worktrees: `/Users/manas/Code/Projects /openpath/openpath-ai-backend` and `/Users/manas/Code/Projects /openpath/openpath-frontend`, siblings of the primary `CODE/` checkout.
-- `main` remains the release branch. Developers do not work directly on `main`.
+- `main` is the shared integration and stable branch. Developers do not work directly on `main`.
 
-The Phase 0 feature branches/worktrees are local until explicitly published. Before opening GitHub PRs from another machine, push `develop` and the feature branch with `git push -u origin <branch>` after checking the remote state. Do not force-push. Current installed dependencies are independent: backend packages in Developer A's worktree; frontend packages in Developer B's worktree.
+The feature branches are published to `origin` after verifying their histories. Current installed dependencies are independent: backend packages in Developer A's worktree; frontend packages in Developer B's worktree. Do not force-push.
 
 ## Worktree commands
 
@@ -45,12 +45,25 @@ If a task crosses ownership, document the endpoint/request/response/status/error
 ## Branch and PR workflow
 
 1. Fetch before planning integration: `git fetch origin`.
-2. Review the incoming branch (`git log --oneline --left-right develop...feature/...` and `git diff develop...feature/...`) before merge/rebase.
+2. Review the incoming branch against main (`git log --oneline --left-right origin/main...feature/<owner>` and `git diff --stat origin/main...feature/<owner>`) before integration.
 3. Commit only files owned by the branch author. Use focused messages such as `feat(ai): ...`, `fix(api): ...`, `test(ai): ...`, or `feat(frontend): ...`.
 4. Push a branch only after checking whether its remote counterpart exists and contains work. Never force-push or reset a shared branch.
-5. Open a PR from the feature branch to `develop`, include tests and API contract changes, and request review from the other developer.
+5. Open a PR from the feature branch to `main`, include tests and API contract changes, and request review from the other developer.
 6. Resolve conflicts in the feature branch after inspecting both sides. Do not discard another developer's changes; ask for coordination when ownership overlaps.
-7. Run the relevant checks in the feature worktree. After integration, run frontend build/lint and backend tests. Merge `develop` to `main` only through an approved release PR.
+7. Run the relevant checks in the feature worktree. After integration, run frontend build/lint and backend tests. Merge only through an approved PR to `main`.
+
+## Synchronize a feature worktree with approved main changes
+
+Run these commands from that developer's worktree. Inspect the incoming commits and diff first; then merge the shared main branch without rewriting the published feature branch:
+
+```bash
+git fetch origin
+git log --oneline --left-right feature/ai-backend...origin/main
+git diff --stat feature/ai-backend...origin/main
+git merge --no-ff origin/main
+```
+
+In Developer B's worktree, substitute `feature/frontend` in the inspection commands. If the merge has conflicts, inspect both sides and coordinate with the owner of the overlapping files; do not discard changes to force a clean merge.
 
 ## API integration procedure
 

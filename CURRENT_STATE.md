@@ -16,9 +16,9 @@ This is an evidence-based snapshot of the connected repository. “Verified” m
 - `origin` points to the OpenPath GitHub repository. `origin/HEAD` resolves to `origin/main`.
 - `main` was clean and equal to `origin/main` when Phase 0 setup began.
 - Existing remote branch `docs/animated-readme` was observed. No local feature branches or additional worktrees existed at the start of setup.
-- Local `develop` was created from `origin/main` at `e22ba5d`; shared baseline documentation is committed at `96597ed`.
-- `feature/ai-backend` and `feature/frontend` both point to `96597ed`. Their isolated worktrees are `../openpath-ai-backend` and `../openpath-frontend`, respectively. Both worktrees have clean tracked status and independent locked dependencies installed.
-- These setup branches are local and have not been pushed. `main` remains unchanged at `e22ba5d`.
+- The Phase 0 documentation-only changes are in `96597ed` and `ae3ce7d`; no application source files changed in those commits.
+- `feature/ai-backend` and `feature/frontend` share the Phase 0 history. Their isolated worktrees are `../openpath-ai-backend` and `../openpath-frontend`, respectively. Both worktrees have clean tracked status and independent locked dependencies installed.
+- `main` is the verified default and common integration branch. Feature branches are published to the same remote after the Phase 0 documents are reviewed and integrated.
 - Do not treat an unpushed local branch as available to a developer on another machine. Publish branches only through the agreed collaboration workflow.
 
 ## Stack and structure
