@@ -271,7 +271,7 @@ openpath/
 └── vite.config.js
 ```
 
-Engineering documentation is grouped in [`docs/`](docs/), including the [developer setup](docs/DEV_SETUP.md), [system architecture](docs/SYSTEM_ARCHITECTURE.md), and [current state](docs/CURRENT_STATE.md).
+Engineering documentation is grouped in [`docs/`](docs/), including [developer setup](docs/DEV_SETUP.md), [system architecture](docs/SYSTEM_ARCHITECTURE.md), [current state](docs/CURRENT_STATE.md), and the draft [backend requirements](docs/BACKEND_REQUIREMENTS.md), [AI provider requirements](docs/AI_PROVIDER_REQUIREMENTS.md), [guest usage requirements](docs/GUEST_USAGE_REQUIREMENTS.md), and [API contracts](docs/API_CONTRACTS.md).
 
 </details>
 
