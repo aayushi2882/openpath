@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="330" viewBox="0 0 880 330" role="img" aria-label="Quick start commands">
+<defs>
+  <linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14161B"/><stop offset="1" stop-color="#0A0B0E"/></linearGradient>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.45"/></filter>
+</defs>
+<rect x="10" y="6" width="860" height="310" rx="14" fill="url(#win)" stroke="#FFFFFF" stroke-opacity="0.12" filter="url(#shadow)"/>
+<path d="M10 20 a14 14 0 0 1 14 -14 H856 a14 14 0 0 1 14 14 V46 H10 Z" fill="#FFFFFF" fill-opacity="0.04"/>
+<circle cx="36" cy="26" r="6" fill="#FF5F57"/><circle cx="58" cy="26" r="6" fill="#FEBC2E"/><circle cx="80" cy="26" r="6" fill="#28C840"/>
+<text x="440.0" y="31" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#8D93A0">openpath — quick start</text>
+
+<clipPath id="c6"><rect x="58.5" y="62" width="0" height="28">
+  <animate attributeName="width" dur="16.0s" repeatCount="indefinite" values="0;0;542;542;0" keyTimes="0;0.037;0.188;0.956;1"/></rect></clipPath>
+<text x="38" y="82" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" opacity="0.95">$</text>
+<g clip-path="url(#c6)"><text x="58.5" y="82" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="542" lengthAdjust="spacingAndGlyphs">git clone https://github.com/aayushi2882/openpath.git</text></g>
+<rect y="66" width="9" height="20" fill="#D2F824">
+  <animate attributeName="x" dur="16.0s" repeatCount="indefinite" calcMode="linear" values="58;58;601;601" keyTimes="0;0.037;0.188;1"/>
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.037;0.038;0.188;0.189;1"/>
+</rect>
+<clipPath id="c34"><rect x="58.5" y="98" width="0" height="28">
+  <animate attributeName="width" dur="16.0s" repeatCount="indefinite" values="0;0;675;675;0" keyTimes="0;0.212;0.400;0.956;1"/></rect></clipPath>
+<text x="38" y="118" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" opacity="0.95">$</text>
+<g clip-path="url(#c34)"><text x="58.5" y="118" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="675" lengthAdjust="spacingAndGlyphs">cd openpath/openpath &amp;&amp; npm install &amp;&amp; npm --prefix server install</text></g>
+<rect y="102" width="9" height="20" fill="#D2F824">
+  <animate attributeName="x" dur="16.0s" repeatCount="indefinite" calcMode="linear" values="58;58;734;734" keyTimes="0;0.212;0.400;1"/>
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.212;0.213;0.400;0.401;1"/>
+</rect>
+<clipPath id="c68"><rect x="58.5" y="134" width="0" height="28">
+  <animate attributeName="width" dur="16.0s" repeatCount="indefinite" values="0;0;225;225;0" keyTimes="0;0.425;0.512;0.956;1"/></rect></clipPath>
+<text x="38" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" opacity="0.95">$</text>
+<g clip-path="url(#c68)"><text x="58.5" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="225" lengthAdjust="spacingAndGlyphs">ollama pull gemma4:e2b</text></g>
+<rect y="138" width="9" height="20" fill="#D2F824">
+  <animate attributeName="x" dur="16.0s" repeatCount="indefinite" calcMode="linear" values="58;58;284;284" keyTimes="0;0.425;0.512;1"/>
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.425;0.426;0.512;0.513;1"/>
+</rect>
+<clipPath id="c86"><rect x="58.5" y="170" width="0" height="28">
+  <animate attributeName="width" dur="16.0s" repeatCount="indefinite" values="0;0;113;113;0" keyTimes="0;0.537;0.600;0.956;1"/></rect></clipPath>
+<text x="38" y="190" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" opacity="0.95">$</text>
+<g clip-path="url(#c86)"><text x="58.5" y="190" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="113" lengthAdjust="spacingAndGlyphs">npm run dev</text></g>
+<rect y="174" width="9" height="20" fill="#D2F824">
+  <animate attributeName="x" dur="16.0s" repeatCount="indefinite" calcMode="linear" values="58;58;171;171" keyTimes="0;0.537;0.600;1"/>
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.537;0.538;0.600;0.601;1"/>
+</rect>
+<text x="38" y="226" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#9AA1AE" font-weight="400">API  ▸  http://localhost:5501
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.631;0.651;0.956;1"/>
+</text>
+<text x="38" y="262" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#9AA1AE" font-weight="400">WEB  ▸  http://localhost:5173
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.656;0.676;0.956;1"/>
+</text>
+<text x="38" y="298" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" font-weight="700">✔  Pick an issue. Your first PR starts here.
+  <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.700;0.720;0.956;1"/>
+</text>
+</svg>
