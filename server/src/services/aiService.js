@@ -61,14 +61,18 @@ const ISSUE_EXPLANATION_SCHEMA = {
   additionalProperties: false,
 };
 
-/** Local Ollama is the only inference provider; API credentials are never read. */
+/** Kaggle Gemma is primary; local Ollama can serve as an optional server-side fallback. */
 export function getAiConfig() {
-  const baseUrl = (process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL).replace(/\/+$/, '');
-  return { configured: true, provider: 'ollama', baseUrl, model: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL };
+  const kaggleKernelUrl = (process.env.KAGGLE_KERNEL_URL || '').trim().replace(/\/+$/, '');
+  const ollamaBaseUrl = (process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL).replace(/\/+$/, '');
+  if (kaggleKernelUrl) {
+    return { configured: true, provider: 'kaggle', kaggleKernelUrl, baseUrl: ollamaBaseUrl,
+      model: process.env.KAGGLE_MODEL || 'gemma-3-4b-it', fallbackModel: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL };
+  }
+  return { configured: true, provider: 'ollama', baseUrl: ollamaBaseUrl, model: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL };
 }
 
-export async function getOllamaStatus() {
-  const config = getAiConfig();
+async function getLocalOllamaStatus(config) {
   try {
     const response = await fetch(`${config.baseUrl}/api/tags`, { signal: AbortSignal.timeout(2500) });
     if (!response.ok) throw new Error(`Ollama returned HTTP ${response.status}.`);
@@ -79,7 +83,25 @@ export async function getOllamaStatus() {
       message: modelInstalled ? null : `Model ${config.model} is not installed. Run: ollama pull ${config.model}` };
   } catch {
     return { configured: false, reachable: false, modelInstalled: false, provider: 'ollama', model: config.model, models: [],
-      message: 'Ollama is unreachable. Start Ollama on this machine, then check the connection again.' };
+      message: 'Local Ollama fallback is unreachable.' };
+  }
+}
+
+export async function getOllamaStatus() {
+  const config = getAiConfig();
+  if (config.provider !== 'kaggle') return getLocalOllamaStatus(config);
+  try {
+    const response = await fetch(`${config.kaggleKernelUrl}/health`, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) throw new Error(`Kaggle returned HTTP ${response.status}.`);
+    const payload = await response.json();
+    if (payload.status !== 'ok') throw new Error('Gemma is not ready on Kaggle.');
+    return { configured: true, reachable: true, modelInstalled: true, provider: 'kaggle', model: config.model,
+      models: Array.isArray(payload.models) ? payload.models : [], message: 'Kaggle Gemma GPU is connected.' };
+  } catch {
+    const fallback = await getLocalOllamaStatus({ ...config, model: config.fallbackModel });
+    if (fallback.configured) return { ...fallback, provider: 'ollama-fallback', primaryProvider: 'kaggle', message: 'Kaggle is offline; local Ollama fallback is ready.' };
+    return { configured: false, reachable: false, modelInstalled: false, provider: 'kaggle', model: config.model,
+      models: [], fallbackAvailable: false, message: 'Kaggle tunnel is offline. Restart the Kaggle notebook, update KAGGLE_KERNEL_URL, then reconnect.' };
   }
 }
 
@@ -167,6 +189,36 @@ Return a valid JSON object with EXACTLY this structure:
  * Call the configured local Ollama model and request JSON output.
  */
 async function callOllama(config, systemPrompt, userPrompt, responseJsonSchema) {
+  if (config.provider === 'kaggle') {
+    try {
+      const response = await fetch(`${config.kaggleKernelUrl}/generate`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180_000),
+        body: JSON.stringify({ prompt: userPrompt, system: systemPrompt, model: config.model, max_tokens: 2200, temperature: 0.2, json_mode: true }),
+      });
+      if (!response.ok) throw new Error(`Kaggle Gemma returned HTTP ${response.status}.`);
+      const result = await response.json();
+      if (typeof result.generated_text !== 'string' || !result.generated_text.trim()) throw new Error('Kaggle Gemma returned an empty response.');
+      return Object.assign(cleanAndParseJson(result.generated_text), { _provider: 'kaggle' });
+    } catch (cause) {
+      if (process.env.OLLAMA_FALLBACK_ENABLED === 'false') {
+        const error = new Error(`Kaggle Gemma is unavailable: ${cause.message}. Reconnect the Kaggle notebook and retry.`);
+        error.status = 502;
+        throw error;
+      }
+      const fallback = { ...config, provider: 'ollama', model: config.fallbackModel, baseUrl: config.baseUrl };
+      const status = await getLocalOllamaStatus(fallback);
+      if (!status.configured) {
+        const error = new Error(`Kaggle Gemma is unavailable and the local Ollama fallback is not ready. ${cause.message}`);
+        error.status = 503;
+        throw error;
+      }
+      return Object.assign(await callLocalOllama(fallback, systemPrompt, userPrompt, responseJsonSchema), { _provider: 'ollama-fallback' });
+    }
+  }
+  return callLocalOllama(config, systemPrompt, userPrompt, responseJsonSchema);
+}
+
+async function callLocalOllama(config, systemPrompt, userPrompt, responseJsonSchema) {
   let payload;
   try {
     const response = await fetch(`${config.baseUrl}/api/chat`, {
@@ -254,10 +306,11 @@ export async function explainIssue({ issue, repository, language = 'en', userSki
   let explanation;
   explanation = await callOllama(config, systemPrompt, userPrompt, ISSUE_EXPLANATION_SCHEMA);
 
+  const activeProvider = explanation._provider || config.provider;
   return {
     configured: true,
-    provider: config.provider,
-    model: config.model,
+    provider: activeProvider,
+    model: activeProvider === 'ollama-fallback' ? config.fallbackModel : config.model,
     language,
     explanation: validateExplanation(explanation),
   };
@@ -356,5 +409,6 @@ Return JSON with a "recommendations" array containing at most 3 entries. Each en
         : [],
     }));
 
-  return { configured: true, provider: config.provider, model: config.model, recommendations };
+  const activeProvider = rawRecommendations._provider || config.provider;
+  return { configured: true, provider: activeProvider, model: activeProvider === 'ollama-fallback' ? config.fallbackModel : config.model, recommendations };
 }

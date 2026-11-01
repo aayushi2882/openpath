@@ -111,7 +111,7 @@ export default function AiExplainerModal({
   const explanation = aiResult?.explanation;
 
   const copyEnvSnippet = () => {
-    navigator.clipboard.writeText('OLLAMA_BASE_URL=http://localhost:11434\nOLLAMA_MODEL=gemma4:e2b');
+    navigator.clipboard.writeText('KAGGLE_KERNEL_URL=https://<your-current-kaggle-tunnel>\nKAGGLE_MODEL=gemma-3-4b-it\nOLLAMA_BASE_URL=http://localhost:11434\nOLLAMA_MODEL=gemma4:e2b\nOLLAMA_FALLBACK_ENABLED=true');
     setCopiedEnv(true);
     setTimeout(() => setCopiedEnv(false), 2000);
   };
@@ -375,7 +375,7 @@ export default function AiExplainerModal({
                       marginBottom: '18px',
                     }}
                   >
-                    To generate live issue breakdowns in simple English and Hinglish, start Ollama and configure it in{' '}
+                    To generate live issue breakdowns in simple English and Hinglish, start the Kaggle notebook and configure its current tunnel URL in{' '}
                     <code style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>server/.env</code>.
                   </p>
 
@@ -392,8 +392,11 @@ export default function AiExplainerModal({
                     }}
                   >
                     <div style={{ color: '#9CA3AF', marginBottom: '6px' }}># In server/.env:</div>
-                    <div style={{ color: 'var(--accent-lime)' }}>OLLAMA_BASE_URL=http://localhost:11434</div>
+                    <div style={{ color: 'var(--accent-lime)' }}>KAGGLE_KERNEL_URL=https://&lt;your-current-kaggle-tunnel&gt;</div>
+                    <div>KAGGLE_MODEL=gemma-3-4b-it</div>
+                    <div>OLLAMA_BASE_URL=http://localhost:11434</div>
                     <div>OLLAMA_MODEL=gemma4:e2b</div>
+                    <div>OLLAMA_FALLBACK_ENABLED=true</div>
 
                     <button
                       type="button"
@@ -468,7 +471,7 @@ export default function AiExplainerModal({
                     }}
                   >
                     <span>
-                    Grounded explanation powered by <strong>{aiResult.model?.toLowerCase().startsWith('gemma') ? 'Gemma via Ollama' : aiResult.provider}</strong> ({aiResult.model})
+                    Grounded explanation powered by <strong>{aiResult.model?.toLowerCase().startsWith('gemma') ? 'Gemma via Kaggle' : aiResult.provider}</strong> ({aiResult.model})
                     </span>
                     <span className="badge badge-lime badge-mono" style={{ fontSize: '11px' }}>
                       {language === 'hinglish' ? 'Hinglish Mode' : 'Simple English Mode'}

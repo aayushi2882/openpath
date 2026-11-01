@@ -35,9 +35,14 @@ PORT=5501
 # Recommended: Add GitHub Token to get 5,000 requests/hr (instead of 10/min)
 GITHUB_TOKEN=
 
-# Local Ollama model:
+# Kaggle Gemma tunnel (refresh URL each time the notebook restarts):
+KAGGLE_KERNEL_URL=https://<your-current-kaggle-tunnel>
+KAGGLE_MODEL=gemma-3-4b-it
+
+# Optional local Ollama fallback:
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=gemma4:e2b
+OLLAMA_FALLBACK_ENABLED=true
 `;
 
   const copyToClipboard = () => {
@@ -134,7 +139,7 @@ OLLAMA_MODEL=gemma4:e2b
 
           {health?.ai?.reachable && health.ai.models?.length > 0 && (
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '-12px', marginBottom: '20px' }}>
-              Installed Ollama models: {health.ai.models.join(', ')}. Set <code>OLLAMA_MODEL</code> in <code>server/.env</code> to choose the model OpenPath uses.
+              Installed local fallback models: {health.ai.models.join(', ')}. Set <code>OLLAMA_MODEL</code> in <code>server/.env</code> to choose the fallback model.
             </p>
           )}
 
@@ -142,7 +147,7 @@ OLLAMA_MODEL=gemma4:e2b
             How to configure your environment:
           </h4>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-            OpenPath uses local Ollama for AI. Start Ollama, then configure <code style={{ fontFamily: 'var(--font-mono)' }}>server/.env</code>:
+            OpenPath sends AI requests from the backend to your Kaggle Gemma tunnel. Set <code style={{ fontFamily: 'var(--font-mono)' }}>KAGGLE_KERNEL_URL</code> in <code>server/.env</code>. Start the notebook first and use its current printed URL. Local Ollama is an optional fallback:
           </p>
 
           <div
@@ -182,7 +187,7 @@ OLLAMA_MODEL=gemma4:e2b
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="badge badge-subtle badge-mono">1</span>
               <span>
-                Start Ollama locally, then run <code>ollama pull gemma4:e2b</code> if needed.
+                Start the Kaggle notebook, copy the current tunnel URL into <code>server/.env</code>, then restart the backend. If you want a local fallback, start Ollama and run <code>ollama pull gemma4:e2b</code>.
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -223,7 +228,7 @@ OLLAMA_MODEL=gemma4:e2b
             className="btn btn-ghost btn-sm"
           >
             <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-            Re-check Status
+            {health?.ai?.provider === 'kaggle' || health?.ai?.provider === 'ollama-fallback' ? 'Reconnect Kaggle' : 'Re-check Status'}
           </button>
           <button type="button" onClick={onClose} className="btn btn-dark btn-sm">
             Close
