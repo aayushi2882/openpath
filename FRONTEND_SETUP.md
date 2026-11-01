@@ -4,7 +4,7 @@
 
 - Worktree: `../openpath-frontend`
 - Branch: `feature/frontend`
-- Own `src/`, frontend tests, UI styles, and frontend-specific configuration/docs. Do not edit `server/` or backend AI/provider logic.
+- Own `frontend/`, frontend tests, UI styles, and frontend-specific configuration/docs. Do not edit `backend/` or backend AI/provider logic.
 - Locked dependencies installed successfully in this worktree with `npm ci`.
 
 ## Requirements
@@ -30,7 +30,7 @@ npm run build
 npm run lint
 ```
 
-Verified in this worktree: `npm run build` passed; `npm run lint` completed with 0 errors and one unused `useEffect` warning at `src/components/SkillReadinessCard.jsx`. Do not modify that file solely as part of setup. There is no `npm test` script at the root. `npm run dev:client` served the app at port 5173 and returned HTTP 200 while Developer A's backend was running at port 5501.
+Previous verification: `npm run build` passed; `npm run lint` completed with 0 errors and one unused `useEffect` warning at `frontend/src/components/SkillReadinessCard.jsx`. There is no `npm test` script at the root. Recheck build and lint after this directory reorganization.
 
 ## Configuration
 

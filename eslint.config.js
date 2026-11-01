@@ -5,9 +5,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules', 'server/node_modules']),
+  globalIgnores(['dist', 'node_modules', 'backend/node_modules']),
   {
-    files: ['src/**/*.{js,jsx}'],
+    files: ['frontend/src/**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
@@ -22,7 +22,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['server/**/*.js'],
+    files: ['backend/**/*.js'],
     extends: [js.configs.recommended],
     languageOptions: {
       globals: globals.node,

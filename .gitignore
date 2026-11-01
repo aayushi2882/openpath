@@ -27,8 +27,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
-!server/.env.example
+!backend/.env.example
 
 # Backend dependencies and build output
-server/node_modules/
-server/dist/
+backend/node_modules/
+backend/dist/

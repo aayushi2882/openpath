@@ -23,11 +23,11 @@ This is an evidence-based snapshot of the connected repository. “Verified” m
 
 ## Stack and structure
 
-- Frontend: React 19, Vite 8, JavaScript, CSS; root `package.json` and `src/`.
-- Backend: Node.js ESM and Express 4; `server/package.json`, `server/src/index.js`, `server/src/routes/`, `server/src/services/`.
-- GitHub integration: direct REST API requests in `server/src/services/githubService.js`.
-- AI: issue AI routes call `server/src/services/aiService.js`; configured Kaggle endpoint is supported with optional local Ollama fallback. Website AI calls Ollama directly in `server/src/services/websiteAnalysisService.js`.
-- Website capture: Playwright Chromium and a custom public-network proxy in `server/src/services/websiteAnalysisService.js`.
+- Frontend: React 19, Vite 8, JavaScript, CSS; application code is in `frontend/` and root `package.json` provides development scripts/tooling.
+- Backend: Node.js ESM and Express 4; `backend/package.json`, `backend/src/index.js`, `backend/src/routes/`, `backend/src/services/`.
+- GitHub integration: direct REST API requests in `backend/src/services/githubService.js`.
+- AI: issue AI routes call `backend/src/services/aiService.js`; configured Kaggle endpoint is supported with optional local Ollama fallback. Website AI calls Ollama directly in `backend/src/services/websiteAnalysisService.js`.
+- Website capture: Playwright Chromium and a custom public-network proxy in `backend/src/services/websiteAnalysisService.js`.
 - Persistence: browser `localStorage` only. No database, user accounts, or job queue was found.
 
 ## Verified commands and runtime checks
@@ -37,8 +37,8 @@ Commands were run in the connected primary checkout on 2026-11-01:
 | Check | Result |
 |---|---|
 | `npm run build` | Passed; Vite production build completed. |
-| `npm run lint` | Completed with 0 errors and 1 warning: unused `useEffect` import in `src/components/SkillReadinessCard.jsx`. |
-| `npm test --prefix server` | 12 passed, 1 failed. The failure is a stale message expectation in `server/src/services/aiService.test.js`; details in `TECHNICAL_DEBT.md`. |
+| `npm run lint` | Previous baseline: completed with 0 errors and 1 warning: unused `useEffect` import in `frontend/src/components/SkillReadinessCard.jsx`. |
+| `npm test --prefix backend` | Previous baseline: 12 passed, 1 failed. The failure is a stale message expectation in `backend/src/services/aiService.test.js`; details in `TECHNICAL_DEBT.md`. |
 | `npm run dev` | Frontend served at `http://localhost:5173/`; Express served at `http://localhost:5501/`. Both started and were stopped cleanly. |
 | `GET /api/health` | HTTP 200, `status: ok`. AI reported unreachable local Ollama; no GitHub token was configured. |
 | `GET /api/ai/status` | HTTP 200; Ollama `gemma4:e2b` unreachable in this environment. |
@@ -47,7 +47,7 @@ Commands were run in the connected primary checkout on 2026-11-01:
 
 The same startup/API checks were repeated from the separate worktrees: Developer B's Vite root returned HTTP 200 while Developer A's Express service was running; the backend health, AI status, repository metadata/docs, and issue requests succeeded as described above.
 
-No actual credentials were printed or recorded. `.env` and `server/.env` were absent by filename check at audit time; only example files were present.
+No actual credentials were printed or recorded. `.env` and `backend/.env` were absent by filename check at audit time; only example files were present.
 
 ## Feature snapshot
 

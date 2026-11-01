@@ -4,12 +4,12 @@ Statuses distinguish code presence from runtime evidence. Full acceptance criter
 
 | Feature / journey | Status | Evidence and gap |
 |---|---|---|
-| Home, open-source learning, and program directory | Implemented; static content | `src/App.jsx`, `src/components/OpenSource101.jsx`, `src/components/OpportunitiesSection.jsx`, and `src/data/`. Build passed; content freshness is not automated. |
-| Public GitHub repository input/search | Implemented and runtime-verified | `src/components/RepositoryWorkspace.jsx`; `server/src/services/githubService.js`; live `vitejs/vite` metadata/docs request succeeded. URL validation is client-side plus path checks server-side. |
+| Home, open-source learning, and program directory | Implemented; static content | `frontend/src/App.jsx`, `frontend/src/components/OpenSource101.jsx`, `frontend/src/components/OpportunitiesSection.jsx`, and `frontend/src/data/`. Build passed before directory move; rerun after reorganization. |
+| Public GitHub repository input/search | Implemented and runtime-verified | `frontend/src/components/RepositoryWorkspace.jsx`; `backend/src/services/githubService.js`; live `vitejs/vite` metadata/docs request succeeded before directory move. URL validation is client-side plus path checks server-side. |
 | Repository issues and pagination | Implemented and runtime-verified | `IssueDiscovery.jsx`; `githubService.js`; public `vitejs/vite` issue query returned real issue data and rate-limit headers. No cache/retry tests. |
 | Pull-request filtering | Implemented in code | `searchIssues()` removes records marked as pull requests. No dedicated GitHub-service test found. |
 | Skills and experience profile | Partially implemented | `App.jsx` and `RepositoryWorkspace.jsx` use browser `localStorage`; no account or cross-device persistence. |
-| Issue recommendations | Partially implemented | `server/src/services/aiService.js` accepts actual supplied issues and filters model output to their issue numbers. No deterministic baseline ranking or live inference verification. |
+| Issue recommendations | Partially implemented | `backend/src/services/aiService.js` accepts actual supplied issues and filters model output to their issue numbers. No deterministic baseline ranking or live inference verification. |
 | Issue explanation and six-step plan | Partially implemented | `explainIssue()` validates required explanation fields; mocked service test covers an Ollama response. Repository file-tree evidence is not supplied. |
 | Kaggle/local AI setup and status | Partially implemented | `getAiConfig()` supports a Kaggle endpoint with local fallback; status endpoint is live. Managed credentials/session lifecycle is absent; local Ollama was offline during smoke check. |
 | Website issue detective | Partially implemented | `WebsiteIssueDetective.jsx` and `websiteAnalysisService.js` provide single-page capture and AI inferences with URL safety controls. No deterministic check catalog, isolated worker, job progress, cancellation, or saved report. |

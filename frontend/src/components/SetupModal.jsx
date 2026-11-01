@@ -29,7 +29,7 @@ export default function SetupModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const sampleEnvText = `# OpenPath Configuration (place in server/.env)
+  const sampleEnvText = `# OpenPath Configuration (place in backend/.env)
 PORT=5501
 
 # Recommended: Add GitHub Token to get 5,000 requests/hr (instead of 10/min)
@@ -139,7 +139,7 @@ OLLAMA_FALLBACK_ENABLED=true
 
           {health?.ai?.reachable && health.ai.models?.length > 0 && (
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '-12px', marginBottom: '20px' }}>
-              Installed local fallback models: {health.ai.models.join(', ')}. Set <code>OLLAMA_MODEL</code> in <code>server/.env</code> to choose the fallback model.
+              Installed local fallback models: {health.ai.models.join(', ')}. Set <code>OLLAMA_MODEL</code> in <code>backend/.env</code> to choose the fallback model.
             </p>
           )}
 
@@ -147,7 +147,7 @@ OLLAMA_FALLBACK_ENABLED=true
             How to configure your environment:
           </h4>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
-            OpenPath sends AI requests from the backend to your Kaggle Gemma tunnel. Set <code style={{ fontFamily: 'var(--font-mono)' }}>KAGGLE_KERNEL_URL</code> in <code>server/.env</code>. Start the notebook first and use its current printed URL. Local Ollama is an optional fallback:
+            OpenPath sends AI requests from the backend to your Kaggle Gemma tunnel. Set <code style={{ fontFamily: 'var(--font-mono)' }}>KAGGLE_KERNEL_URL</code> in <code>backend/.env</code>. Start the notebook first and use its current printed URL. Local Ollama is an optional fallback:
           </p>
 
           <div
@@ -187,7 +187,7 @@ OLLAMA_FALLBACK_ENABLED=true
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="badge badge-subtle badge-mono">1</span>
               <span>
-                Start the Kaggle notebook, copy the current tunnel URL into <code>server/.env</code>, then restart the backend. If you want a local fallback, start Ollama and run <code>ollama pull gemma4:e2b</code>.
+                Start the Kaggle notebook, copy the current tunnel URL into <code>backend/.env</code>, then restart the backend. If you want a local fallback, start Ollama and run <code>ollama pull gemma4:e2b</code>.
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

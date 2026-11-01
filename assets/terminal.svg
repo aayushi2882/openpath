@@ -19,7 +19,7 @@
 <clipPath id="c34"><rect x="58.5" y="98" width="0" height="28">
   <animate attributeName="width" dur="16.0s" repeatCount="indefinite" values="0;0;675;675;0" keyTimes="0;0.212;0.400;0.956;1"/></rect></clipPath>
 <text x="38" y="118" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#D2F824" opacity="0.95">$</text>
-<g clip-path="url(#c34)"><text x="58.5" y="118" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="675" lengthAdjust="spacingAndGlyphs">cd openpath/openpath &amp;&amp; npm install &amp;&amp; npm --prefix server install</text></g>
+<g clip-path="url(#c34)"><text x="58.5" y="118" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" fill="#E8EAEE" textLength="675" lengthAdjust="spacingAndGlyphs">cd openpath &amp;&amp; npm install &amp;&amp; npm --prefix backend install</text></g>
 <rect y="102" width="9" height="20" fill="#D2F824">
   <animate attributeName="x" dur="16.0s" repeatCount="indefinite" calcMode="linear" values="58;58;734;734" keyTimes="0;0.212;0.400;1"/>
   <animate attributeName="opacity" dur="16.0s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.212;0.213;0.400;0.401;1"/>

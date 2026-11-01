@@ -36,8 +36,8 @@ Verified branch names: `feature/ai-backend` and `feature/frontend`. Each worktre
 
 | Developer | Owns | Avoid editing |
 |---|---|---|
-| A — AI/backend | `server/`, backend tests, backend configuration/docs; backend architecture and API behavior. | `src/`, React components, page/UI behavior, CSS, frontend dependencies. |
-| B — frontend | `src/`, frontend tests, frontend-facing configuration/docs and UI. | `server/`, backend AI/provider logic, middleware, backend dependencies. |
+| A — AI/backend | `backend/`, backend tests, backend configuration/docs; backend architecture and API behavior. | `frontend/`, React components, page/UI behavior, CSS, frontend dependencies. |
+| B — frontend | `frontend/`, frontend tests, frontend-facing configuration/docs and UI. | `backend/`, backend AI/provider logic, middleware, backend dependencies. |
 | Shared | API contract, current-state/architecture/roadmap docs, integration and release checks. | Coordinate before editing shared files or changing request/response contracts. |
 
 If a task crosses ownership, document the endpoint/request/response/status/error contract and hand it to the other developer; do not edit their worktree files.
@@ -67,7 +67,7 @@ In Developer B's worktree, substitute `feature/frontend` in the inspection comma
 
 ## API integration procedure
 
-Current client calls are centralized in `src/services/api.js`; Express routes live under `server/src/routes/`. Before changing a contract, record method/path, request shape, success response, error response/status, timeout behavior, and authentication expectations in the owning PR or shared contract document. Frontend work integrates against that contract and uses the Vite `/api` proxy; do not assume undocumented response fields.
+Current client calls are centralized in `frontend/src/services/api.js`; Express routes live under `backend/src/routes/`. Before changing a contract, record method/path, request shape, success response, error response/status, timeout behavior, and authentication expectations in the owning PR or shared contract document. Frontend work integrates against that contract and uses the Vite `/api` proxy; do not assume undocumented response fields.
 
 ## Known baseline
 

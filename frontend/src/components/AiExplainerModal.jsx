@@ -376,7 +376,7 @@ export default function AiExplainerModal({
                     }}
                   >
                     To generate live issue breakdowns in simple English and Hinglish, start the Kaggle notebook and configure its current tunnel URL in{' '}
-                    <code style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>server/.env</code>.
+                    <code style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>backend/.env</code>.
                   </p>
 
                   <div
@@ -391,7 +391,7 @@ export default function AiExplainerModal({
                       position: 'relative',
                     }}
                   >
-                    <div style={{ color: '#9CA3AF', marginBottom: '6px' }}># In server/.env:</div>
+                    <div style={{ color: '#9CA3AF', marginBottom: '6px' }}># In backend/.env:</div>
                     <div style={{ color: 'var(--accent-lime)' }}>KAGGLE_KERNEL_URL=https://&lt;your-current-kaggle-tunnel&gt;</div>
                     <div>KAGGLE_MODEL=gemma-3-4b-it</div>
                     <div>OLLAMA_BASE_URL=http://localhost:11434</div>

@@ -222,7 +222,7 @@ export async function searchIssues({
     if (response.status === 403 || response.status === 429) {
       const resetTime = rateLimitResetDate ? new Date(rateLimitResetDate).toLocaleTimeString() : 'shortly';
       throw new Error(
-        `GitHub API rate limit reached. Resets at ${resetTime}. (Tip: Add a GITHUB_TOKEN in server/.env for up to 5,000 requests/hour)`
+        `GitHub API rate limit reached. Resets at ${resetTime}. (Tip: Add a GITHUB_TOKEN in backend/.env for up to 5,000 requests/hour)`
       );
     }
     const errorBody = await response.text();

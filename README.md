@@ -195,7 +195,7 @@ ollama pull gemma4:e2b
 
 ```bash
 npm install
-npm --prefix server install
+npm --prefix backend install
 ```
 
 **4 · (Optional) add a GitHub token**
@@ -203,8 +203,8 @@ npm --prefix server install
 Unauthenticated GitHub requests are heavily rate-limited. A free token raises the limit a lot.
 
 ```bash
-cp server/.env.example server/.env
-# then set GITHUB_TOKEN=your_token inside server/.env
+cp backend/.env.example backend/.env
+# then set GITHUB_TOKEN=your_token inside backend/.env
 ```
 
 **5 · Run everything**
@@ -248,21 +248,21 @@ npm run dev
 
 ```text
 openpath/
-├── public/                  # favicon & icons
-├── server/
+├── backend/                 # Express API and AI/GitHub services
 │   ├── src/
 │   │   ├── routes/          # ai.js · health.js · issues.js
 │   │   ├── services/        # aiService.js · githubService.js
 │   │   └── index.js         # Express entry point
 │   └── .env.example
-├── src/
-│   ├── components/          # Hero, IssueDiscovery, AiExplainerModal,
-│   │                        # ContributionRoadmap, SkillReadinessCard, ...
-│   ├── data/                # guide content & programs directory
-│   ├── services/api.js      # frontend API client
-│   ├── App.jsx
-│   └── main.jsx
-├── index.html
+├── frontend/                # React + Vite application
+│   ├── public/              # favicon & icons
+│   ├── src/
+│   │   ├── components/      # Hero, IssueDiscovery, AiExplainerModal, ...
+│   │   ├── data/            # guide content & programs directory
+│   │   ├── services/api.js  # frontend API client
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── index.html
 ├── package.json
 └── vite.config.js
 ```

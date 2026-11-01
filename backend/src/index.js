@@ -12,7 +12,7 @@ import aiRouter from './routes/ai.js';
 import websiteAnalysisRouter from './routes/websiteAnalysis.js';
 import { getAiConfig } from './services/aiService.js';
 
-// Load server/.env before reading PORT so the server's setting is authoritative.
+// Load backend/.env before reading PORT so the server's setting is authoritative.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env'), override: true });
