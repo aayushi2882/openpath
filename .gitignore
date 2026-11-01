@@ -27,7 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
-!backend/.env.example
 
 # Backend dependencies and build output
 backend/node_modules/

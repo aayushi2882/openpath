@@ -34,7 +34,7 @@ npx playwright install chromium
 
 ## Environment and secrets
 
-Copy `backend/.env.example` to `backend/.env` for local configuration. Supported example names include `PORT`, `GITHUB_TOKEN`, `KAGGLE_KERNEL_URL`, `KAGGLE_MODEL`, `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `OLLAMA_FALLBACK_ENABLED`, and `WEBSITE_ANALYSIS_TIMEOUT_MS`. The example file contains placeholders, not credentials. Keep real values only in ignored local `.env` files; never commit or log them. No `.env` or `backend/.env` file was present by filename check during this baseline.
+Copy `backend/.env.example` to `backend/.env` for backend configuration. Supported example names include `PORT`, `GITHUB_TOKEN`, `KAGGLE_KERNEL_URL`, `KAGGLE_MODEL`, `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `OLLAMA_FALLBACK_ENABLED`, and `WEBSITE_ANALYSIS_TIMEOUT_MS`. The example file contains placeholders, not credentials. Keep real values only in ignored local `.env` files; never commit or log them.
 
 AI readiness is available at `GET /api/ai/status`; application health is `GET /api/health`. A successful health response does not mean AI is ready. Baseline AI status returned HTTP 200 but Ollama was unreachable. GitHub works without a token at a low unauthenticated limit; add a token only in local backend configuration if needed.
 

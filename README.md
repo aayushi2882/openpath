@@ -255,6 +255,7 @@ openpath/
 │   │   └── index.js         # Express entry point
 │   └── .env.example
 ├── frontend/                # React + Vite application
+│   ├── .env.example         # optional Vite API URL override
 │   ├── public/              # favicon & icons
 │   ├── src/
 │   │   ├── components/      # Hero, IssueDiscovery, AiExplainerModal, ...
@@ -263,9 +264,14 @@ openpath/
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   └── index.html
-├── package.json
+├── docs/                    # setup, architecture, audit, roadmap, debt
+├── package.json             # root development scripts and frontend tooling
+├── package-lock.json
+├── eslint.config.js
 └── vite.config.js
 ```
+
+Engineering documentation is grouped in [`docs/`](docs/), including the [developer setup](docs/DEV_SETUP.md), [system architecture](docs/SYSTEM_ARCHITECTURE.md), and [current state](docs/CURRENT_STATE.md).
 
 </details>
 
