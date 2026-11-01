@@ -16,7 +16,9 @@ This is an evidence-based snapshot of the connected repository. “Verified” m
 - `origin` points to the OpenPath GitHub repository. `origin/HEAD` resolves to `origin/main`.
 - `main` was clean and equal to `origin/main` when Phase 0 setup began.
 - Existing remote branch `docs/animated-readme` was observed. No local feature branches or additional worktrees existed at the start of setup.
-- A local `develop` integration branch is being used as the common base for `feature/ai-backend` and `feature/frontend`. See `DEV_SETUP.md` for the final worktree paths and branch ownership.
+- Local `develop` was created from `origin/main` at `e22ba5d`; shared baseline documentation is committed at `96597ed`.
+- `feature/ai-backend` and `feature/frontend` both point to `96597ed`. Their isolated worktrees are `../openpath-ai-backend` and `../openpath-frontend`, respectively. Both worktrees have clean tracked status and independent locked dependencies installed.
+- These setup branches are local and have not been pushed. `main` remains unchanged at `e22ba5d`.
 - Do not treat an unpushed local branch as available to a developer on another machine. Publish branches only through the agreed collaboration workflow.
 
 ## Stack and structure
@@ -43,6 +45,8 @@ Commands were run in the connected primary checkout on 2026-11-01:
 | Repository metadata | `GET /api/repositories/vitejs/vite` returned success, repository identity/language, README, and contribution guide. |
 | Repository issues | `GET /api/repositories/vitejs/vite/issues?per_page=1` returned success and one real issue. GitHub reported unauthenticated limit 10, remaining 9 at request time. |
 
+The same startup/API checks were repeated from the separate worktrees: Developer B's Vite root returned HTTP 200 while Developer A's Express service was running; the backend health, AI status, repository metadata/docs, and issue requests succeeded as described above.
+
 No actual credentials were printed or recorded. `.env` and `server/.env` were absent by filename check at audit time; only example files were present.
 
 ## Feature snapshot
@@ -53,3 +57,5 @@ No actual credentials were printed or recorded. `.env` and `server/.env` were ab
 - **Known content issue:** the preserved root `README.md` still describes the old nested `openpath/` layout and its quick-start command uses `cd openpath/openpath`; app files now live at repository root. README artwork under `assets/` was restored in commit `e22ba5d`.
 
 See `FEATURE_AUDIT.md`, `TECHNICAL_DEBT.md`, `SYSTEM_ARCHITECTURE.md`, and `ROADMAP.md` for details.
+
+**Phase 0 readiness:** Both worktrees are prepared and verified. Phase 0 is ready for review but remains open until both developers approve the baseline; the backend test mismatch and unavailable AI runtime are recorded limitations.

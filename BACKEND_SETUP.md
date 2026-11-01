@@ -10,6 +10,7 @@
 
 - Verified in the baseline environment: Node.js `v20.20.0`, npm `10.8.2`.
 - Backend package: `server/package.json`; dependencies are pinned in `server/package-lock.json`.
+- Locked backend dependencies installed successfully in this worktree with `npm ci --prefix server`.
 
 ```bash
 cd ../openpath-ai-backend
@@ -39,9 +40,9 @@ AI readiness is available at `GET /api/ai/status`; application health is `GET /a
 
 ## Current tests and smoke checks
 
-Run `npm test --prefix server`. Baseline result: 12 pass, 1 fail. `server/src/services/aiService.test.js` expects the unreachable Ollama status text to contain `Start Ollama`, while implementation returns `Local Ollama fallback is unreachable.` Investigate the intended user message before changing the test or implementation.
+Run `npm test --prefix server`. Verified in this worktree: 12 pass, 1 fail. `server/src/services/aiService.test.js` expects the unreachable Ollama status text to contain `Start Ollama`, while implementation returns `Local Ollama fallback is unreachable.` Investigate the intended user message before changing the test or implementation.
 
-Verified public workflow: `GET /api/repositories/vitejs/vite` returned metadata, README, and contribution guide; `GET /api/repositories/vitejs/vite/issues?per_page=1` returned one real issue. Both were live unauthenticated GitHub API calls.
+Verified from this worktree: Express started on port 5501; `GET /api/health` and `GET /api/ai/status` returned HTTP 200. AI readiness reported local Ollama unreachable; no secret values were printed. `GET /api/repositories/vitejs/vite` returned metadata, README, and contribution guide; `GET /api/repositories/vitejs/vite/issues?per_page=1` returned one real issue. Both were live unauthenticated GitHub API calls.
 
 ## API handoff
 

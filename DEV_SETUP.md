@@ -4,16 +4,16 @@
 
 - Canonical repo: `https://github.com/aayushi2882/openpath.git`
 - Default/release branch: `main` (`origin/HEAD -> origin/main`).
-- Integration base: local `develop`, based on the verified `origin/main` commit and containing the shared Phase 0 baseline docs.
-- Developer branches: `feature/ai-backend` and `feature/frontend`, both created from the same `develop` commit.
-- Worktrees: `../openpath-ai-backend` and `../openpath-frontend`, siblings of the primary `CODE/` checkout.
+- Integration base: local `develop`, created from `origin/main` at `e22ba5d`; shared Phase 0 docs are committed at `96597ed`.
+- Developer branches: `feature/ai-backend` and `feature/frontend`, both currently at the same `develop` commit `96597ed`.
+- Worktrees: `/Users/manas/Code/Projects /openpath/openpath-ai-backend` and `/Users/manas/Code/Projects /openpath/openpath-frontend`, siblings of the primary `CODE/` checkout.
 - `main` remains the release branch. Developers do not work directly on `main`.
 
-The Phase 0 feature branches/worktrees are local until explicitly published. Before opening GitHub PRs from another machine, push `develop` and the feature branch with `git push -u origin <branch>` after checking the remote state.
+The Phase 0 feature branches/worktrees are local until explicitly published. Before opening GitHub PRs from another machine, push `develop` and the feature branch with `git push -u origin <branch>` after checking the remote state. Do not force-push. Current installed dependencies are independent: backend packages in Developer A's worktree; frontend packages in Developer B's worktree.
 
 ## Worktree commands
 
-Run from the primary repository root:
+The two worktrees are already created. For future local clones, first fetch and check branch/worktree state; then create a worktree only if its branch and path are not already in use:
 
 ```bash
 git fetch origin
@@ -30,7 +30,7 @@ git -C ../openpath-frontend branch --show-current
 git worktree list
 ```
 
-Expected branch names: `feature/ai-backend` and `feature/frontend`. Each worktree has its own checkout; Git metadata and object storage are shared by design. Keep local `.env` files out of Git; worktrees do not automatically copy ignored environment files.
+Verified branch names: `feature/ai-backend` and `feature/frontend`. Each worktree has its own checkout; Git metadata and object storage are shared by design. Keep local `.env` files out of Git; worktrees do not automatically copy ignored environment files.
 
 ## File ownership
 

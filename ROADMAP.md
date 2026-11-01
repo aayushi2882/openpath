@@ -4,7 +4,7 @@ The governing plan is the OpenPath Master Implementation Plan (Phases 0–10). T
 
 | Phase | Name | Status at baseline |
 |---|---|---|
-| 0 | Existing repository audit and engineering baseline | In progress: audit/runtime baseline completed; docs and two worktrees are being established; server test has one known assertion mismatch. |
+| 0 | Existing repository audit and engineering baseline | Ready for review: audit, docs, independent worktrees, dependency installation and smoke tests completed. Awaiting both developers' approval; one backend assertion mismatch and unavailable local AI are recorded. |
 | 1 | Product requirements and UX planning | Not started. |
 | 2 | Architecture and infrastructure foundation | Partial existing Express/Vite structure; formal contracts, persistence/queue decision, CI, and provider interface not established. |
 | 3 | Repository Intelligence stabilization | Partial: GitHub metadata/issues and UI exist; deterministic ranking, cache/retry, and evidence-backed empty fallback remain. |
@@ -22,7 +22,8 @@ The governing plan is the OpenPath Master Implementation Plan (Phases 0–10). T
 - [x] Current branch/status/worktrees and existing branches inspected before setup.
 - [x] Build, lint, backend tests, app startup, health, AI status, and live public GitHub metadata/issues path checked.
 - [x] Current-state, architecture, feature and technical-debt notes prepared in repository documentation.
-- [ ] `develop`, both feature branches and separate worktrees verified and setup docs finalized.
+- [x] `develop`, both feature branches, separate worktrees, independent dependency installs, and setup docs verified.
+- [x] Frontend build/lint, backend tests, separate-worktree startup, health/AI status, and live GitHub metadata/issues checks recorded.
 - [ ] Both developers approve the baseline and confirm both environments are usable.
 
-Do not start Phase 1 implementation until the remaining Phase 0 checks are satisfied and both developers approve.
+Phase 0 is prepared for review, but it is not marked complete until both developers approve. Do not start Phase 1 implementation before that sign-off.
